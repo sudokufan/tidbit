@@ -13,12 +13,20 @@ export const Auth = () => {
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
 
-  const createUserConnectionsDoc = async (userId: string) => {
+  const ensureUserDocuments = async (userId: string) => {
     const userConnectionsRef = doc(db, "connections", userId);
-    const userDoc = await getDoc(userConnectionsRef);
+    const userUpdateTimesRef = doc(db, "updateTimes", userId);
 
-    if (!userDoc.exists()) {
+    // Ensure "connections" document exists
+    const userConnectionsSnap = await getDoc(userConnectionsRef);
+    if (!userConnectionsSnap.exists()) {
       await setDoc(userConnectionsRef, {connections: []});
+    }
+
+    // Ensure "updateTimes" document exists
+    const userUpdateTimesSnap = await getDoc(userUpdateTimesRef);
+    if (!userUpdateTimesSnap.exists()) {
+      await setDoc(userUpdateTimesRef, {updateTime: "12:00"});
     }
   };
 
@@ -28,7 +36,7 @@ export const Auth = () => {
     const user = userCredential.user;
 
     if (user) {
-      await createUserConnectionsDoc(user.uid);
+      await ensureUserDocuments(user.uid);
     }
   };
 
@@ -51,7 +59,7 @@ export const Auth = () => {
     }
 
     if (user) {
-      await createUserConnectionsDoc(user.uid);
+      await ensureUserDocuments(user.uid);
     }
   };
 

@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db, auth } from "../lib/firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
+import {useEffect, useState} from "react";
+import {doc, getDoc, setDoc} from "firebase/firestore";
+import {db, auth} from "../lib/firebase";
+import {useAuthState} from "react-firebase-hooks/auth";
 
 export const TidbitFeed = () => {
   interface Tidbit {
@@ -22,7 +22,6 @@ export const TidbitFeed = () => {
     const fetchFeed = async () => {
       const dailyFeedRef = doc(db, "dailyFeed", user.uid);
       const dailyFeedSnap = await getDoc(dailyFeedRef);
-
       const updateTimeRef = doc(db, "updateTimes", user.uid);
       const updateTimeSnap = await getDoc(updateTimeRef);
 
@@ -30,7 +29,14 @@ export const TidbitFeed = () => {
       let shouldUpdate = false;
       let updateTimeStr = "";
 
-      if (updateTimeSnap.exists()) {
+      if (!updateTimeSnap.exists()) {
+        console.warn(
+          "No updateTimes document found for user. Setting default update time.",
+        );
+        const defaultUpdateTime = "12:00";
+        await setDoc(updateTimeRef, {updateTime: defaultUpdateTime});
+        updateTimeStr = defaultUpdateTime;
+      } else {
         updateTimeStr = updateTimeSnap.data().updateTime;
         const [hours, minutes] = updateTimeStr.split(":").map(Number);
         const updateTimeToday = new Date();
@@ -43,10 +49,13 @@ export const TidbitFeed = () => {
 
       if (shouldUpdate || !dailyFeedSnap.exists()) {
         const tidbitsSnap = await getDoc(doc(db, "tidbits", user.uid));
-
         if (tidbitsSnap.exists()) {
-          await setDoc(dailyFeedRef, { tidbits: tidbitsSnap.data().tidbits });
-          setTidbits(tidbitsSnap.data().tidbits);
+          const tidbitsData = tidbitsSnap.data().tidbits || [];
+          await setDoc(dailyFeedRef, {tidbits: tidbitsData});
+          setTidbits(tidbitsData);
+        } else {
+          await setDoc(dailyFeedRef, {tidbits: []});
+          setTidbits([]);
         }
       } else {
         setTidbits(dailyFeedSnap.data().tidbits || []);

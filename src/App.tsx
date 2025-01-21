@@ -1,37 +1,54 @@
-// import { Route, Routes } from "react-router-dom";
-
-// import IndexPage from "@/pages/index";
-// import DocsPage from "@/pages/docs";
-// import PricingPage from "@/pages/pricing";
-// import BlogPage from "@/pages/blog";
-// import AboutPage from "@/pages/about";
-import { Auth } from "./components/auth";
-import { TidbitForm } from "./components/tidbitForm";
-import { TidbitFeed } from "./components/tidbitFeed";
-import { auth } from "./lib/firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
+import {Route, Routes, Navigate} from "react-router-dom";
+import {Auth} from "./components/auth";
+import {TidbitForm} from "./components/tidbitForm";
+import {TidbitFeed} from "./components/tidbitFeed";
+import {DailyUpdateSettings} from "./components/dailyUpdateSettings";
+import {ConnectionList} from "./components/connectionList";
+import {InviteLinkGenerator} from "./components/inviteLinkGenerator";
+import {Invite} from "./pages/invite";
+import {auth} from "./lib/firebase";
+import {useAuthState} from "react-firebase-hooks/auth";
+import {Navbar} from "./components/navbar";
 
 function App() {
   const [user] = useAuthState(auth);
-  return (
-    // <Routes>
-    //   <Route element={<IndexPage />} path="/" />
-    //   <Route element={<DocsPage />} path="/docs" />
-    //   <Route element={<PricingPage />} path="/pricing" />
-    //   <Route element={<BlogPage />} path="/blog" />
-    //   <Route element={<AboutPage />} path="/about" />
-    // </Routes>
 
-    <div className="flex flex-col items-center p-4">
-      {user ? (
-        <>
-          <TidbitForm />
-          <TidbitFeed />
-        </>
-      ) : (
-        <Auth />
-      )}
-    </div>
+  return (
+    <>
+      {user && <Navbar />}
+      <Routes>
+        <Route
+          path="/"
+          element={user ? <Navigate to="/dashboard" /> : <Auth />}
+        />
+        <Route
+          path="/dashboard"
+          element={
+            user ? (
+              <div className="flex flex-col items-center p-4">
+                <TidbitForm />
+                <TidbitFeed />
+              </div>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/settings/daily-update"
+          element={user ? <DailyUpdateSettings /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/settings/connections"
+          element={user ? <ConnectionList /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/settings/invite"
+          element={user ? <InviteLinkGenerator /> : <Navigate to="/" />}
+        />
+        <Route path="/invite/:inviteId" element={<Invite />} />
+      </Routes>
+    </>
   );
 }
 

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Tidbit</string>
+    <string name="title_activity_main">Tidbit</string>
+    <string name="package_name">com.example.tidbit</string>
+    <string name="custom_url_scheme">com.example.tidbit</string>
+</resources>

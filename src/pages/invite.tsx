@@ -28,7 +28,7 @@ export const Invite = () => {
 
       const {inviter, expiresAt} = inviteSnap.data();
 
-      if (expiresAt.toDate() < new Date()) {
+      if (expiresAt.toMillis() < Date.now()) {
         setMessage("This invite has expired.");
         await deleteDoc(inviteRef);
         return;

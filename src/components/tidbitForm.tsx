@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
-import { doc, setDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
-import { db, auth } from "../lib/firebase";
+import {useEffect, useState} from "react";
+import {doc, setDoc, onSnapshot, serverTimestamp} from "firebase/firestore";
+import {db, auth} from "../lib/firebase";
 
 export const TidbitForm = () => {
   const [message, setMessage] = useState("");
   const [emoji, setEmoji] = useState("💬");
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [lastTimestamp, setLastTimestamp] = useState<number | null>(null);
   const [canPost, setCanPost] = useState(false);
   const [latestTidbit, setLatestTidbit] = useState<{
     emoji: string;
@@ -25,8 +26,9 @@ export const TidbitForm = () => {
           message: tidbitData.message,
         });
 
-        const lastTimestamp = tidbitData.timestamp?.toDate();
+        const lastTimestamp = tidbitData.timestamp?.toMillis();
         if (lastTimestamp) {
+          setLastTimestamp(lastTimestamp);
           const now = new Date();
           const diffMs =
             24 * 60 * 60 * 1000 - (now.getTime() - lastTimestamp.getTime());
@@ -48,12 +50,18 @@ export const TidbitForm = () => {
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
-        if (!prev || prev <= 1000) {
+        if (!prev) return null;
+
+        const now = new Date().getTime();
+        const remainingTime = (lastTimestamp ?? 0) + 24 * 60 * 60 * 1000 - now;
+
+        if (remainingTime <= 0) {
           clearInterval(interval);
           setCanPost(true);
           return 0;
         }
-        return prev - 1000;
+
+        return remainingTime;
       });
     }, 1000);
 
@@ -72,7 +80,7 @@ export const TidbitForm = () => {
       timestamp: serverTimestamp(),
     });
 
-    setLatestTidbit({ emoji, message });
+    setLatestTidbit({emoji, message});
     setMessage("");
     setTimeLeft(24 * 60 * 60 * 1000);
     setCanPost(false);

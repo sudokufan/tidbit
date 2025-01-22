@@ -30,8 +30,7 @@ export const TidbitForm = () => {
         if (lastTimestamp) {
           setLastTimestamp(lastTimestamp);
           const now = new Date();
-          const diffMs =
-            24 * 60 * 60 * 1000 - (now.getTime() - lastTimestamp.getTime());
+          const diffMs = 24 * 60 * 60 * 1000 - (now.getTime() - lastTimestamp);
           if (diffMs > 0) {
             setTimeLeft(diffMs);
             setCanPost(false);
@@ -43,30 +42,29 @@ export const TidbitForm = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [auth.currentUser]);
 
   useEffect(() => {
-    if (timeLeft === null) return;
+    if (!lastTimestamp) return;
 
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (!prev) return null;
+    const updateCountdown = () => {
+      const now = Date.now();
+      const remainingTime = lastTimestamp + 24 * 60 * 60 * 1000 - now;
 
-        const now = new Date().getTime();
-        const remainingTime = (lastTimestamp ?? 0) + 24 * 60 * 60 * 1000 - now;
+      if (remainingTime <= 0) {
+        setTimeLeft(0);
+        setCanPost(true);
+      } else {
+        setTimeLeft(remainingTime);
+      }
+    };
 
-        if (remainingTime <= 0) {
-          clearInterval(interval);
-          setCanPost(true);
-          return 0;
-        }
+    updateCountdown();
 
-        return remainingTime;
-      });
-    }, 1000);
+    const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft]);
+  }, [lastTimestamp]);
 
   const postTidbit = async () => {
     if (!auth.currentUser || !canPost) return;
@@ -87,7 +85,7 @@ export const TidbitForm = () => {
   };
 
   const formatTimeLeft = () => {
-    if (!timeLeft || timeLeft <= 0) return "";
+    if (timeLeft === null || timeLeft <= 0) return "Next post available now!";
     const hours = Math.floor(timeLeft / (1000 * 60 * 60));
     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);

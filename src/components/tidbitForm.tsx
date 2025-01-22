@@ -4,7 +4,7 @@ import {db, auth} from "../lib/firebase";
 
 export const TidbitForm = () => {
   const [message, setMessage] = useState("");
-  const [emoji, setEmoji] = useState("💬");
+  const [emoji, setEmoji] = useState("🎉");
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [lastTimestamp, setLastTimestamp] = useState<number | null>(null);
   const [canPost, setCanPost] = useState(false);
@@ -94,7 +94,7 @@ export const TidbitForm = () => {
 
   return (
     <div className="p-4 max-w-md mx-auto">
-      {latestTidbit ? (
+      {latestTidbit && timeLeft !== null && timeLeft > 0 ? (
         <div className="p-4 border rounded-lg bg-white shadow-md text-center">
           <p className="text-2xl">
             {latestTidbit.emoji} {latestTidbit.message}

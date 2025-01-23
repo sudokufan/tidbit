@@ -48,15 +48,45 @@ export const TidbitFeed = () => {
       }
 
       if (shouldUpdate || !dailyFeedSnap.exists()) {
-        const tidbitsSnap = await getDoc(doc(db, "tidbits", user.uid));
-        if (tidbitsSnap.exists()) {
-          const tidbitsData = tidbitsSnap.data().tidbits || [];
-          await setDoc(dailyFeedRef, {tidbits: tidbitsData});
-          setTidbits(tidbitsData);
-        } else {
+        const connectionsRef = doc(db, "connections", user.uid);
+        const connectionsSnap = await getDoc(connectionsRef);
+
+        if (!connectionsSnap.exists()) {
+          console.warn("No connections found.");
           await setDoc(dailyFeedRef, {tidbits: []});
           setTidbits([]);
+          return;
         }
+
+        const connections = connectionsSnap.data()?.connections || [];
+        if (connections.length === 0) {
+          console.warn("User has no connections.");
+          await setDoc(dailyFeedRef, {tidbits: []});
+          setTidbits([]);
+          return;
+        }
+
+        const tidbitsData: Tidbit[] = [];
+
+        await Promise.all(
+          connections.map(async (connectionId: string) => {
+            const tidbitRef = doc(db, "tidbits", connectionId);
+            const tidbitSnap = await getDoc(tidbitRef);
+
+            if (tidbitSnap.exists()) {
+              tidbitsData.push({
+                id: connectionId,
+                emoji: tidbitSnap.data().emoji,
+                username: tidbitSnap.data().username,
+                message: tidbitSnap.data().message,
+                timestamp: tidbitSnap.data().timestamp,
+              });
+            }
+          }),
+        );
+
+        await setDoc(dailyFeedRef, {tidbits: tidbitsData});
+        setTidbits(tidbitsData);
       } else {
         setTidbits(dailyFeedSnap.data().tidbits || []);
       }

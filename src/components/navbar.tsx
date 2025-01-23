@@ -15,6 +15,9 @@ export const Navbar = () => {
       <Link to="/settings/invite" className="px-4">
         Invite
       </Link>
+      <Link to="/profile" className="px-4">
+        Profile
+      </Link>
     </nav>
   );
 };

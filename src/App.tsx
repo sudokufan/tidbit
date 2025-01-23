@@ -9,6 +9,7 @@ import {Invite} from "./pages/invite";
 import {auth} from "./lib/firebase";
 import {useAuthState} from "react-firebase-hooks/auth";
 import {Navbar} from "./components/navbar";
+import {Profile} from "./components/profile";
 
 function App() {
   const [user] = useAuthState(auth);
@@ -33,6 +34,10 @@ function App() {
               <Navigate to="/" />
             )
           }
+        />
+        <Route
+          path="/profile"
+          element={user ? <Profile /> : <Navigate to="/" />}
         />
         <Route
           path="/settings/daily-update"

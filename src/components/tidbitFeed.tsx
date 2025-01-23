@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {doc, getDoc, setDoc} from "firebase/firestore";
+import {doc, getDoc, setDoc, Timestamp} from "firebase/firestore";
 import {db, auth} from "../lib/firebase";
 import {useAuthState} from "react-firebase-hooks/auth";
 
@@ -25,73 +25,78 @@ export const TidbitFeed = () => {
       const updateTimeRef = doc(db, "updateTimes", user.uid);
       const updateTimeSnap = await getDoc(updateTimeRef);
 
-      const now = new Date();
-      let shouldUpdate = false;
       let updateTimeStr = "";
 
       if (!updateTimeSnap.exists()) {
-        console.warn(
-          "No updateTimes document found for user. Setting default update time.",
-        );
+        console.warn("No updateTimes document found. Setting default time.");
         const defaultUpdateTime = "12:00";
         await setDoc(updateTimeRef, {updateTime: defaultUpdateTime});
         updateTimeStr = defaultUpdateTime;
       } else {
         updateTimeStr = updateTimeSnap.data().updateTime;
-        const [hours, minutes] = updateTimeStr.split(":").map(Number);
-        const updateTimeToday = new Date();
-        updateTimeToday.setHours(hours, minutes, 0, 0);
-
-        if (now >= updateTimeToday) {
-          shouldUpdate = true;
-        }
-      }
-
-      if (shouldUpdate || !dailyFeedSnap.exists()) {
-        const connectionsRef = doc(db, "connections", user.uid);
-        const connectionsSnap = await getDoc(connectionsRef);
-
-        if (!connectionsSnap.exists()) {
-          console.warn("No connections found.");
-          await setDoc(dailyFeedRef, {tidbits: []});
-          setTidbits([]);
-          return;
-        }
-
-        const connections = connectionsSnap.data()?.connections || [];
-        if (connections.length === 0) {
-          console.warn("User has no connections.");
-          await setDoc(dailyFeedRef, {tidbits: []});
-          setTidbits([]);
-          return;
-        }
-
-        const tidbitsData: Tidbit[] = [];
-
-        await Promise.all(
-          connections.map(async (connectionId: string) => {
-            const tidbitRef = doc(db, "tidbits", connectionId);
-            const tidbitSnap = await getDoc(tidbitRef);
-
-            if (tidbitSnap.exists()) {
-              tidbitsData.push({
-                id: connectionId,
-                emoji: tidbitSnap.data().emoji,
-                username: tidbitSnap.data().username,
-                message: tidbitSnap.data().message,
-                timestamp: tidbitSnap.data().timestamp,
-              });
-            }
-          }),
-        );
-
-        await setDoc(dailyFeedRef, {tidbits: tidbitsData});
-        setTidbits(tidbitsData);
-      } else {
-        setTidbits(dailyFeedSnap.data().tidbits || []);
       }
 
       setNextUpdate(updateTimeStr);
+
+      const [hours, minutes] = updateTimeStr.split(":").map(Number);
+      const updateTimeToday = new Date();
+      updateTimeToday.setHours(hours, minutes, 0, 0);
+
+      const lastUpdate = dailyFeedSnap.exists()
+        ? dailyFeedSnap.data()?.lastUpdated?.toMillis() || 0
+        : 0;
+      const nextAllowedUpdate = updateTimeToday.getTime();
+
+      if (lastUpdate >= nextAllowedUpdate) {
+        console.log("🕰 Using cached daily feed (not time for an update).");
+        setTidbits(dailyFeedSnap.data()?.tidbits || []);
+        return;
+      }
+
+      console.log("🔄 Updating daily feed...");
+
+      const connectionsRef = doc(db, "connections", user.uid);
+      const connectionsSnap = await getDoc(connectionsRef);
+
+      if (!connectionsSnap.exists()) {
+        console.warn("No connections found.");
+        await setDoc(dailyFeedRef, {tidbits: [], lastUpdated: Timestamp.now()});
+        setTidbits([]);
+        return;
+      }
+
+      const connections = connectionsSnap.data()?.connections || [];
+      if (connections.length === 0) {
+        console.warn("User has no connections.");
+        await setDoc(dailyFeedRef, {tidbits: [], lastUpdated: Timestamp.now()});
+        setTidbits([]);
+        return;
+      }
+
+      const tidbitsData: Tidbit[] = [];
+      await Promise.all(
+        connections.map(async (connectionId: string) => {
+          const tidbitRef = doc(db, "tidbits", connectionId);
+          const tidbitSnap = await getDoc(tidbitRef);
+
+          if (tidbitSnap.exists()) {
+            tidbitsData.push({
+              id: connectionId,
+              emoji: tidbitSnap.data().emoji,
+              username: tidbitSnap.data().username,
+              message: tidbitSnap.data().message,
+              timestamp: tidbitSnap.data().timestamp,
+            });
+          }
+        }),
+      );
+
+      await setDoc(dailyFeedRef, {
+        tidbits: tidbitsData,
+        lastUpdated: Timestamp.now(),
+      });
+
+      setTidbits(tidbitsData);
     };
 
     fetchFeed();

@@ -7,6 +7,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import {db, auth} from "../lib/firebase";
+import EmojiPicker from "emoji-picker-react";
 
 export const TidbitForm = () => {
   const [message, setMessage] = useState("");
@@ -18,6 +19,7 @@ export const TidbitForm = () => {
     emoji: string;
     message: string;
   } | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   useEffect(() => {
     if (!auth.currentUser) return;
@@ -66,7 +68,6 @@ export const TidbitForm = () => {
     };
 
     updateCountdown();
-
     const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
@@ -119,14 +120,25 @@ export const TidbitForm = () => {
         </div>
       ) : (
         <>
-          <div className="flex items-center space-x-3 bg-white p-4 rounded-lg shadow-md">
-            <input
-              type="text"
-              placeholder="Emoji (e.g., 😊)"
-              value={emoji}
-              onChange={(e) => setEmoji(e.target.value)}
-              className="w-12 text-xl text-center border p-2 rounded"
-            />
+          <div className="flex items-center space-x-3 bg-white p-4 rounded-lg shadow-md relative">
+            <button
+              onClick={() => setShowEmojiPicker((prev) => !prev)}
+              className="w-12 h-12 text-3xl border rounded bg-gray-100 flex items-center justify-center"
+            >
+              {emoji}
+            </button>
+
+            {showEmojiPicker && (
+              <div className="absolute top-20 left-0 z-50">
+                <EmojiPicker
+                  onEmojiClick={(event) => {
+                    setEmoji(event.emoji);
+                    setShowEmojiPicker(false);
+                  }}
+                />
+              </div>
+            )}
+
             <input
               type="text"
               placeholder="What's your tidbit?"

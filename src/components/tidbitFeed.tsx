@@ -104,6 +104,8 @@ export const TidbitFeed = () => {
 
   if (!user) return <p>Please log in to see Tidbits.</p>;
 
+  console.log(tidbits);
+
   return (
     <div className="p-4">
       <p className="text-gray-500 text-sm text-center">

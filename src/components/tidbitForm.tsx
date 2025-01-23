@@ -1,5 +1,11 @@
 import {useEffect, useState} from "react";
-import {doc, setDoc, onSnapshot, serverTimestamp} from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  onSnapshot,
+  serverTimestamp,
+  getDoc,
+} from "firebase/firestore";
 import {db, auth} from "../lib/firebase";
 
 export const TidbitForm = () => {
@@ -69,10 +75,20 @@ export const TidbitForm = () => {
   const postTidbit = async () => {
     if (!auth.currentUser || !canPost) return;
 
-    const tidbitRef = doc(db, "tidbits", auth.currentUser.uid);
+    const userId = auth.currentUser.uid;
+    const tidbitRef = doc(db, "tidbits", userId);
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+
+    let username = "Unknown";
+
+    if (userSnap.exists()) {
+      username = userSnap.data().name || "Unknown";
+    }
+
     await setDoc(tidbitRef, {
-      userId: auth.currentUser.uid,
-      username: auth.currentUser.displayName,
+      userId,
+      username,
       emoji,
       message,
       timestamp: serverTimestamp(),

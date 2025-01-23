@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {doc, getDoc, setDoc, Timestamp} from "firebase/firestore";
 import {db, auth} from "../lib/firebase";
 import {useAuthState} from "react-firebase-hooks/auth";
+import {Preferences} from "@capacitor/preferences";
 
 export const TidbitFeed = () => {
   interface Tidbit {
@@ -16,25 +17,33 @@ export const TidbitFeed = () => {
   const [nextUpdate, setNextUpdate] = useState<string | null>(null);
   const [user] = useAuthState(auth);
 
+  const saveFeedToCache = async (userId: string, data: any) => {
+    await Preferences.set({
+      key: `dailyFeed_${userId}`,
+      value: JSON.stringify(data),
+    });
+  };
+
+  const loadFeedFromCache = async (userId: string) => {
+    const result = await Preferences.get({key: `dailyFeed_${userId}`});
+    return result.value ? JSON.parse(result.value) : null;
+  };
+
   useEffect(() => {
     if (!user) return;
 
     const fetchFeed = async () => {
-      const dailyFeedRef = doc(db, "dailyFeed", user.uid);
-      const dailyFeedSnap = await getDoc(dailyFeedRef);
-      const updateTimeRef = doc(db, "updateTimes", user.uid);
+      const userId = user.uid;
+      const dailyFeedRef = doc(db, "dailyFeed", userId);
+      const updateTimeRef = doc(db, "updateTimes", userId);
+      const connectionsRef = doc(db, "connections", userId);
+
+      const cachedFeed = await loadFeedFromCache(userId);
+
       const updateTimeSnap = await getDoc(updateTimeRef);
-
-      let updateTimeStr = "";
-
-      if (!updateTimeSnap.exists()) {
-        console.warn("No updateTimes document found. Setting default time.");
-        const defaultUpdateTime = "12:00";
-        await setDoc(updateTimeRef, {updateTime: defaultUpdateTime});
-        updateTimeStr = defaultUpdateTime;
-      } else {
-        updateTimeStr = updateTimeSnap.data().updateTime;
-      }
+      let updateTimeStr = updateTimeSnap.exists()
+        ? updateTimeSnap.data().updateTime
+        : "12:00";
 
       setNextUpdate(updateTimeStr);
 
@@ -42,22 +51,27 @@ export const TidbitFeed = () => {
       const updateTimeToday = new Date();
       updateTimeToday.setHours(hours, minutes, 0, 0);
 
+      const dailyFeedSnap = await getDoc(dailyFeedRef);
       const lastUpdate = dailyFeedSnap.exists()
         ? dailyFeedSnap.data()?.lastUpdated?.toMillis() || 0
         : 0;
       const nextAllowedUpdate = updateTimeToday.getTime();
 
+      if (cachedFeed?.lastUpdated >= nextAllowedUpdate) {
+        console.log("🕰 Using cached daily feed.");
+        setTidbits(cachedFeed.tidbits || []);
+        return;
+      }
+
       if (lastUpdate >= nextAllowedUpdate) {
-        console.log("🕰 Using cached daily feed (not time for an update).");
+        console.log("🕰 Using Firestore cached feed.");
         setTidbits(dailyFeedSnap.data()?.tidbits || []);
         return;
       }
 
-      console.log("🔄 Updating daily feed...");
+      console.log("🔄 Fetching new daily feed...");
 
-      const connectionsRef = doc(db, "connections", user.uid);
       const connectionsSnap = await getDoc(connectionsRef);
-
       if (!connectionsSnap.exists()) {
         console.warn("No connections found.");
         await setDoc(dailyFeedRef, {tidbits: [], lastUpdated: Timestamp.now()});
@@ -91,9 +105,19 @@ export const TidbitFeed = () => {
         }),
       );
 
-      await setDoc(dailyFeedRef, {
+      if (
+        JSON.stringify(tidbitsData) !==
+        JSON.stringify(dailyFeedSnap.data()?.tidbits)
+      ) {
+        await setDoc(dailyFeedRef, {
+          tidbits: tidbitsData,
+          lastUpdated: Timestamp.now(),
+        });
+      }
+
+      await saveFeedToCache(userId, {
         tidbits: tidbitsData,
-        lastUpdated: Timestamp.now(),
+        lastUpdated: Timestamp.now().toMillis(),
       });
 
       setTidbits(tidbitsData);
@@ -103,8 +127,6 @@ export const TidbitFeed = () => {
   }, [user]);
 
   if (!user) return <p>Please log in to see Tidbits.</p>;
-
-  console.log(tidbits);
 
   return (
     <div className="p-4">

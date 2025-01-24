@@ -11,11 +11,7 @@ import {
   where,
 } from "firebase/firestore";
 import {useAuthState} from "react-firebase-hooks/auth";
-import {
-  deleteUser,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-} from "firebase/auth";
+import {EmailAuthProvider, reauthenticateWithCredential} from "firebase/auth";
 
 export const Profile = () => {
   const [user] = useAuthState(auth);
@@ -115,7 +111,7 @@ export const Profile = () => {
       });
       await Promise.all(updates);
 
-      await deleteUser(user);
+      await user.delete();
 
       alert("Your account has been deleted.");
     } catch (error: any) {
@@ -156,13 +152,13 @@ export const Profile = () => {
         </button>
       </div>
 
-      <button
+      {/* <button
         onClick={deleteAccount}
         disabled={loading}
         className="bg-red-500 text-white px-4 py-2 rounded w-full"
       >
         Delete Account
-      </button>
+      </button> */}
     </div>
   );
 };

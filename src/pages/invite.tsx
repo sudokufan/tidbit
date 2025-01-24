@@ -76,17 +76,6 @@ export const Invite = () => {
       });
       console.log("Connections updated successfully.");
 
-      console.log("Deleting invite...");
-      try {
-        await deleteDoc(inviteRef);
-        console.log("✅ Invite deleted successfully.");
-      } catch (error) {
-        console.error("🔥 Error deleting invite:", error);
-        setMessage(
-          `Error deleting invite: ${(error as any).message || "Unknown error"}`,
-        );
-      }
-
       setMessage("You are now connected!");
       setTimeout(() => navigate("/"), 2000);
     } catch (error) {

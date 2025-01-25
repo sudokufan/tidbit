@@ -9,7 +9,7 @@ import {Invite} from "./pages/invite";
 import {auth} from "./lib/firebase";
 import {useAuthState} from "react-firebase-hooks/auth";
 import {Profile} from "./components/profile";
-import Navbar from "./components/navbar";
+import {Navbar} from "./components/navbar";
 
 function App() {
   const [user] = useAuthState(auth);

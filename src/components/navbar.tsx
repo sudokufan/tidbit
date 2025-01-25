@@ -10,7 +10,7 @@ import {
 } from "@heroui/react";
 import {useState} from "react";
 
-export default function Navbar() {
+export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -85,4 +85,4 @@ export default function Navbar() {
       </NavbarMenu>
     </HeroUINavbar>
   );
-}
+};

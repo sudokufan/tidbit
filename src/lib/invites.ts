@@ -8,7 +8,7 @@ export const generateInviteLink = async (): Promise<string | null> => {
   const inviteId = uuidv4();
   const inviterId = auth.currentUser.uid;
 
-  const expiresAt = Timestamp.fromMillis(Date.now() + 24 * 60 * 60 * 1000);
+  const expiresAt = Timestamp.fromMillis(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   const inviteRef = doc(db, "invites", inviteId);
 

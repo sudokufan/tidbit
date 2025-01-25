@@ -16,7 +16,7 @@ export const Navbar = () => {
   return (
     <HeroUINavbar
       onMenuOpenChange={setIsMenuOpen}
-      className="text-white bg-[#800020]"
+      className="text-white bg-[#660033]"
     >
       <NavbarContent>
         <NavbarMenuToggle
@@ -58,27 +58,27 @@ export const Navbar = () => {
 
       <NavbarMenu>
         <NavbarMenuItem>
-          <Link className="text-[#800020]" href="/dashboard">
+          <Link className="text-[#660033]" href="/dashboard">
             Dashboard
           </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <Link className="text-[#800020]" href="/settings/daily-update">
+          <Link className="text-[#660033]" href="/settings/daily-update">
             Daily Update
           </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <Link className="text-[#800020]" href="/settings/connections">
+          <Link className="text-[#660033]" href="/settings/connections">
             Connections
           </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <Link className="text-[#800020]" href="/settings/invite">
+          <Link className="text-[#660033]" href="/settings/invite">
             Invite
           </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <Link className="text-[#800020]" href="/profile">
+          <Link className="text-[#660033]" href="/profile">
             Profile
           </Link>
         </NavbarMenuItem>

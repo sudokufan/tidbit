@@ -152,13 +152,14 @@ export const Profile = () => {
         </button>
       </div>
 
-      {/* <button
+      <button
         onClick={deleteAccount}
-        disabled={loading}
+        // disabled={loading}
+        disabled
         className="bg-red-500 text-white px-4 py-2 rounded w-full"
       >
-        Delete Account
-      </button> */}
+        Delete Account (coming soon)
+      </button>
     </div>
   );
 };

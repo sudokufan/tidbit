@@ -8,8 +8,8 @@ import {InviteLinkGenerator} from "./components/inviteLinkGenerator";
 import {Invite} from "./pages/invite";
 import {auth} from "./lib/firebase";
 import {useAuthState} from "react-firebase-hooks/auth";
-import {Navbar} from "./components/navbar";
 import {Profile} from "./components/profile";
+import Navbar from "./components/navbar";
 
 function App() {
   const [user] = useAuthState(auth);

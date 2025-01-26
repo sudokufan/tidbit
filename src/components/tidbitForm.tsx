@@ -123,13 +123,11 @@ export const TidbitForm = () => {
     if (!canPost) return;
 
     setIsPending(true);
-    setPendingTimeLeft(60);
-    console.log("⏳ Tidbit pending for 60 seconds...");
+    setPendingTimeLeft(30);
 
     const timeout = setTimeout(() => {
-      console.log("✅ Tidbit auto-posted!");
       confirmPostTidbit();
-    }, 60000);
+    }, 30000);
 
     setPendingTimeout(timeout);
   };
@@ -137,7 +135,6 @@ export const TidbitForm = () => {
   const cancelPost = () => {
     if (pendingTimeout) {
       clearTimeout(pendingTimeout);
-      console.log("❌ Tidbit posting canceled!");
     }
     setIsPending(false);
     setPendingTimeout(null);

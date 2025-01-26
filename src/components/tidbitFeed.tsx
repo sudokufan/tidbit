@@ -94,13 +94,17 @@ export const TidbitFeed = () => {
           const tidbitSnap = await getDoc(tidbitRef);
 
           if (tidbitSnap.exists()) {
-            tidbitsData.push({
-              id: connectionId,
-              emoji: tidbitSnap.data().emoji,
-              username: tidbitSnap.data().username,
-              message: tidbitSnap.data().message,
-              timestamp: tidbitSnap.data().timestamp,
-            });
+            const tidbitTime = tidbitSnap.data().timestamp?.toMillis() ?? 0;
+            const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
+            if (tidbitTime >= twentyFourHoursAgo) {
+              tidbitsData.push({
+                id: connectionId,
+                emoji: tidbitSnap.data().emoji,
+                username: tidbitSnap.data().username,
+                message: tidbitSnap.data().message,
+                timestamp: tidbitSnap.data().timestamp,
+              });
+            }
           }
         }),
       );

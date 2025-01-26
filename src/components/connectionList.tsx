@@ -56,14 +56,10 @@ export const ConnectionList = () => {
           const userRef = doc(db, "users", connectionId);
           const userSnap = await getDoc(userRef);
 
-          console.log(`🔎 Checking user profile for: ${connectionId}`);
-
           if (!userSnap.exists()) {
             console.warn(`⚠️ User profile missing for: ${connectionId}`);
             return {id: connectionId, name: "Unknown User"};
           }
-
-          console.log(`✅ Found user profile:`, userSnap.data());
 
           return {
             id: connectionId,
@@ -100,14 +96,9 @@ export const ConnectionList = () => {
           const userRef = doc(db, "users", docSnap.id);
           const userSnap = await getDoc(userRef);
 
-          console.log(`🔎 Checking user profile for: ${docSnap.id}`);
-
           if (!userSnap.exists()) {
-            console.warn(`⚠️ User profile missing for: ${docSnap.id}`);
             return {id: docSnap.id, name: "Unknown User"};
           }
-
-          console.log(`✅ Found user profile:`, userSnap.data());
 
           return {
             id: docSnap.id,
@@ -115,11 +106,6 @@ export const ConnectionList = () => {
               userSnap.data().name || userSnap.data().email || "Unknown User",
           };
         }),
-      );
-
-      console.log(
-        "✅ Retrieved profiles of people who connected with you:",
-        connectedProfiles,
       );
       setConnectedToYou(connectedProfiles);
     };

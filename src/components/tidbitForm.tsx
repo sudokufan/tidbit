@@ -20,6 +20,11 @@ export const TidbitForm = () => {
     message: string;
   } | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+  const [pendingTimeout, setPendingTimeout] = useState<NodeJS.Timeout | null>(
+    null,
+  );
+  const [pendingTimeLeft, setPendingTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
     if (!auth.currentUser) return;
@@ -73,8 +78,18 @@ export const TidbitForm = () => {
     return () => clearInterval(interval);
   }, [lastTimestamp]);
 
-  const postTidbit = async () => {
-    if (!auth.currentUser || !canPost) return;
+  useEffect(() => {
+    if (!isPending || pendingTimeLeft === null) return;
+
+    const interval = setInterval(() => {
+      setPendingTimeLeft((prev) => (prev !== null && prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isPending]);
+
+  const confirmPostTidbit = async () => {
+    if (!auth.currentUser) return;
 
     const userId = auth.currentUser.uid;
     const tidbitRef = doc(db, "tidbits", userId);
@@ -99,6 +114,34 @@ export const TidbitForm = () => {
     setMessage("");
     setTimeLeft(24 * 60 * 60 * 1000);
     setCanPost(false);
+    setIsPending(false);
+    setPendingTimeout(null);
+    setPendingTimeLeft(null);
+  };
+
+  const postTidbit = () => {
+    if (!canPost) return;
+
+    setIsPending(true);
+    setPendingTimeLeft(60);
+    console.log("⏳ Tidbit pending for 60 seconds...");
+
+    const timeout = setTimeout(() => {
+      console.log("✅ Tidbit auto-posted!");
+      confirmPostTidbit();
+    }, 60000);
+
+    setPendingTimeout(timeout);
+  };
+
+  const cancelPost = () => {
+    if (pendingTimeout) {
+      clearTimeout(pendingTimeout);
+      console.log("❌ Tidbit posting canceled!");
+    }
+    setIsPending(false);
+    setPendingTimeout(null);
+    setPendingTimeLeft(null);
   };
 
   const formatTimeLeft = () => {
@@ -146,14 +189,29 @@ export const TidbitForm = () => {
               onChange={(e) => setMessage(e.target.value)}
               className="flex-1 border p-2 rounded"
             />
-            <button
-              onClick={postTidbit}
-              disabled={!canPost}
-              className="bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50"
-            >
-              Post
-            </button>
+            {!isPending ? (
+              <button
+                onClick={postTidbit}
+                disabled={!canPost}
+                className="bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50"
+              >
+                Post
+              </button>
+            ) : (
+              <button
+                onClick={cancelPost}
+                className="bg-red-500 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            )}
           </div>
+
+          {isPending && pendingTimeLeft !== null && (
+            <p className="text-sm text-gray-500 text-center mt-2">
+              Tidbit will be posted in {pendingTimeLeft}s unless canceled.
+            </p>
+          )}
         </>
       )}
     </div>

@@ -14,15 +14,12 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <HeroUINavbar
-      isMenuOpen={isMenuOpen}
-      onMenuOpenChange={setIsMenuOpen}
-      className="text-white bg-[#660033]"
-    >
+    <HeroUINavbar isMenuOpen={isMenuOpen} className="text-white bg-[#660033]">
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="sm:hidden"
+          onPress={() => setIsMenuOpen(!isMenuOpen)}
         />
         <NavbarBrand>
           {/* You can add your logo or brand name here */}
@@ -60,7 +57,7 @@ export const Navbar = () => {
       <NavbarMenu>
         <NavbarMenuItem>
           <Link
-            onClick={() => setIsMenuOpen(false)}
+            onPress={() => setIsMenuOpen(false)}
             className="text-[#660033]"
             href="/dashboard"
           >
@@ -69,7 +66,7 @@ export const Navbar = () => {
         </NavbarMenuItem>
         <NavbarMenuItem>
           <Link
-            onClick={() => setIsMenuOpen(false)}
+            onPress={() => setIsMenuOpen(false)}
             className="text-[#660033]"
             href="/settings/daily-update"
           >
@@ -78,7 +75,7 @@ export const Navbar = () => {
         </NavbarMenuItem>
         <NavbarMenuItem>
           <Link
-            onClick={() => setIsMenuOpen(false)}
+            onPress={() => setIsMenuOpen(false)}
             className="text-[#660033]"
             href="/settings/connections"
           >
@@ -87,7 +84,7 @@ export const Navbar = () => {
         </NavbarMenuItem>
         <NavbarMenuItem>
           <Link
-            onClick={() => setIsMenuOpen(false)}
+            onPress={() => setIsMenuOpen(false)}
             className="text-[#660033]"
             href="/settings/invite"
           >
@@ -96,7 +93,7 @@ export const Navbar = () => {
         </NavbarMenuItem>
         <NavbarMenuItem>
           <Link
-            onClick={() => setIsMenuOpen(false)}
+            onPress={() => setIsMenuOpen(false)}
             className="text-[#660033]"
             href="/profile"
           >

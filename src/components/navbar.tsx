@@ -15,6 +15,7 @@ export const Navbar = () => {
 
   return (
     <HeroUINavbar
+      isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       className="text-white bg-[#660033]"
     >
@@ -58,27 +59,47 @@ export const Navbar = () => {
 
       <NavbarMenu>
         <NavbarMenuItem>
-          <Link className="text-[#660033]" href="/dashboard">
+          <Link
+            onClick={() => setIsMenuOpen(false)}
+            className="text-[#660033]"
+            href="/dashboard"
+          >
             Dashboard
           </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <Link className="text-[#660033]" href="/settings/daily-update">
+          <Link
+            onClick={() => setIsMenuOpen(false)}
+            className="text-[#660033]"
+            href="/settings/daily-update"
+          >
             Daily Update
           </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <Link className="text-[#660033]" href="/settings/connections">
+          <Link
+            onClick={() => setIsMenuOpen(false)}
+            className="text-[#660033]"
+            href="/settings/connections"
+          >
             Connections
           </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <Link className="text-[#660033]" href="/settings/invite">
+          <Link
+            onClick={() => setIsMenuOpen(false)}
+            className="text-[#660033]"
+            href="/settings/invite"
+          >
             Invite
           </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <Link className="text-[#660033]" href="/profile">
+          <Link
+            onClick={() => setIsMenuOpen(false)}
+            className="text-[#660033]"
+            href="/profile"
+          >
             Profile
           </Link>
         </NavbarMenuItem>

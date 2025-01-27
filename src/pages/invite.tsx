@@ -31,7 +31,6 @@ export const Invite = () => {
   }, [inviteId]);
 
   const handleInvite = async (user: User) => {
-    console.log("Checking invite ID:", inviteId);
     if (!inviteId) {
       setMessage("Invalid or expired invite.");
       return;
@@ -40,29 +39,19 @@ export const Invite = () => {
     const inviteSnap = await getDoc(inviteRef);
 
     if (!inviteSnap.exists()) {
-      console.log("Invite does not exist.");
       setMessage("Invalid or expired invite.");
       return;
     }
 
     const {inviter, expiresAt} = inviteSnap.data();
-    console.log("Invite found:", inviteSnap.data());
 
     if (!expiresAt || expiresAt.toMillis() < Date.now()) {
-      console.log("Invite has expired.");
       setMessage("This invite has expired.");
       await deleteDoc(inviteRef);
       return;
     }
 
     const currentUserId = user.uid;
-
-    console.log(
-      "Updating connections for inviter:",
-      inviter,
-      "and user:",
-      currentUserId,
-    );
 
     const userConnectionsRef = doc(db, "connections", currentUserId);
 

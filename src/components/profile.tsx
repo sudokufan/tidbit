@@ -71,7 +71,6 @@ export const Profile = () => {
             password,
           );
           await reauthenticateWithCredential(user, credential);
-          console.log("✅ User reauthenticated successfully.");
         } catch (reauthError) {
           console.error("❌ Reauthentication failed:", reauthError);
           alert("Reauthentication failed. Please try logging out and back in.");

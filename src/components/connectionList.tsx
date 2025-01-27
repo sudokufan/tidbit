@@ -23,7 +23,6 @@ export const ConnectionList = () => {
       if (!auth.currentUser) return;
 
       const userId = auth.currentUser.uid;
-      console.log("🔍 Fetching connections for:", userId);
 
       const connectionsRef = doc(db, "connections", userId);
       const connectionsSnap = await getDoc(connectionsRef);
@@ -34,7 +33,6 @@ export const ConnectionList = () => {
       }
 
       const connectionIds = connectionsSnap.data()?.connections || [];
-      console.log("✅ Connection IDs:", connectionIds);
 
       if (!Array.isArray(connectionIds)) {
         console.error(
@@ -50,7 +48,6 @@ export const ConnectionList = () => {
         return;
       }
 
-      console.log("🔄 Fetching user profiles for connection IDs...");
       const connectionProfiles = await Promise.all(
         connectionIds.map(async (connectionId: string) => {
           const userRef = doc(db, "users", connectionId);
@@ -69,7 +66,6 @@ export const ConnectionList = () => {
         }),
       );
 
-      console.log("✅ Retrieved Connection Profiles:", connectionProfiles);
       setConnections(connectionProfiles);
     };
 
@@ -77,7 +73,6 @@ export const ConnectionList = () => {
       if (!auth.currentUser) return;
 
       const userId = auth.currentUser.uid;
-      console.log("🔍 Fetching people who have connected with:", userId);
 
       const q = query(
         collection(db, "connections"),

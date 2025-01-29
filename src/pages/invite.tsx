@@ -34,6 +34,7 @@ export const Invite = () => {
       setMessage("Invalid or expired invite.");
       return;
     }
+
     const inviteRef = doc(db, "invites", inviteId);
     const inviteSnap = await getDoc(inviteRef);
 
@@ -53,8 +54,10 @@ export const Invite = () => {
     const currentUserId = user.uid;
 
     const userConnectionsRef = doc(db, "connections", currentUserId);
+    const inviterConnectionsRef = doc(db, "connections", inviter);
 
     try {
+      // Add inviter to current user's connections
       await updateDoc(userConnectionsRef, {
         connections: arrayUnion(inviter),
       }).catch(async (err) => {
@@ -62,9 +65,19 @@ export const Invite = () => {
           await setDoc(userConnectionsRef, {connections: [inviter]});
         } else throw err;
       });
-      console.log("Connections updated successfully.");
 
-      setMessage("You are now connected!");
+      // Add current user to inviter's connections
+      await updateDoc(inviterConnectionsRef, {
+        connections: arrayUnion(currentUserId),
+      }).catch(async (err) => {
+        if (err.code === "not-found") {
+          await setDoc(inviterConnectionsRef, {connections: [currentUserId]});
+        } else throw err;
+      });
+
+      console.log("✅ Connections updated successfully.");
+
+      setMessage("🎉 You are now connected!");
       setTimeout(() => navigate("/"), 2000);
     } catch (error) {
       console.error("🔥 Firestore error:", error);

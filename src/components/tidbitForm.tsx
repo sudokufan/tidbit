@@ -101,7 +101,7 @@ export const TidbitForm = ({onPostConfirm}: TidbitFormProps) => {
     let username = "Unknown";
 
     if (userSnap.exists()) {
-      username = userSnap.data().name || "Unknown";
+      username = userSnap.data().name;
     }
 
     await setDoc(tidbitRef, {

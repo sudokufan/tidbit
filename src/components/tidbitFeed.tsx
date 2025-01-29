@@ -35,7 +35,7 @@ export const TidbitFeed = ({refresh}: TidbitFeedProps) => {
         const dailyFeedSnap = await getDoc(dailyFeedRef);
         console.log("🕰 Using Firestore daily feed.");
         setTidbits(dailyFeedSnap.data()?.tidbits || []);
-        saveFeedToLocalStorage(userId, {
+        await saveFeedToLocalStorage(userId, {
           tidbits: dailyFeedSnap.data()?.tidbits,
           lastUpdated: Timestamp.now().toMillis(),
         });

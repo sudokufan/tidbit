@@ -25,11 +25,6 @@ export const TidbitForm = ({onPostConfirm}: TidbitFormProps) => {
     message: string;
   } | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [isPending, setIsPending] = useState(false);
-  const [pendingTimeout, setPendingTimeout] = useState<NodeJS.Timeout | null>(
-    null,
-  );
-  const [pendingTimeLeft, setPendingTimeLeft] = useState<number | null>(null);
 
   //   • Subscribes to a Firestore “tidbits” document for the current user.
   // • Whenever this doc changes, we read its data (like emoji, message, and timestamp).
@@ -92,20 +87,6 @@ export const TidbitForm = ({onPostConfirm}: TidbitFormProps) => {
     return () => clearInterval(interval);
   }, [lastTimestamp]);
 
-  // this is the useEffect that:
-  // • Watches whether we’re in a “pending” state and if we have a pending countdown running.
-  // • If so, it sets up a 1-second interval, decreasing that counter each second.
-  // • Once the time hits zero (or we manually stop it), we clear out that timer.
-  useEffect(() => {
-    if (!isPending || pendingTimeLeft === null) return;
-
-    const interval = setInterval(() => {
-      setPendingTimeLeft((prev) => (prev !== null && prev > 0 ? prev - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isPending]);
-
   //   • Gathers the current user’s ID and looks up the user’s name in Firestore (defaulting to “Unknown”).
   // • Creates or updates a “tidbits” doc with the user’s ID, name, chosen emoji, message, and a new timestamp.
   // • Resets the local state to indicate we’ve just posted: clears out the message, sets the cooldown timer back to 24 hours, disables future posts, and resets any pending states.
@@ -138,34 +119,6 @@ export const TidbitForm = ({onPostConfirm}: TidbitFormProps) => {
     setMessage("");
     setTimeLeft(24 * 60 * 60 * 1000);
     setCanPost(false);
-    setIsPending(false);
-    setPendingTimeout(null);
-    setPendingTimeLeft(null);
-  };
-
-  // • Checks if posting is allowed. If it is, we begin a 30-second “pending” window (like a final confirmation countdown).
-  // • After 30 seconds, confirmPostTidbit is called automatically.
-  // • If we bail early, we can clear that timeout so we don’t accidentally post anyway.
-  const postTidbit = () => {
-    if (!canPost) return;
-
-    setIsPending(true);
-    setPendingTimeLeft(30);
-
-    const timeout = setTimeout(() => {
-      confirmPostTidbit();
-    }, 30000);
-
-    setPendingTimeout(timeout);
-  };
-
-  const cancelPost = () => {
-    if (pendingTimeout) {
-      clearTimeout(pendingTimeout);
-    }
-    setIsPending(false);
-    setPendingTimeout(null);
-    setPendingTimeLeft(null);
   };
 
   const formatTimeLeft = () => {
@@ -213,29 +166,14 @@ export const TidbitForm = ({onPostConfirm}: TidbitFormProps) => {
               onChange={(e) => setMessage(e.target.value)}
               className="flex-1 border p-2 rounded"
             />
-            {!isPending ? (
-              <button
-                onClick={postTidbit}
-                disabled={!canPost}
-                className="bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50"
-              >
-                Post
-              </button>
-            ) : (
-              <button
-                onClick={cancelPost}
-                className="bg-red-500 text-white px-4 py-2 rounded"
-              >
-                Cancel
-              </button>
-            )}
+            <button
+              onClick={confirmPostTidbit}
+              disabled={!canPost}
+              className="bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50"
+            >
+              Post
+            </button>
           </div>
-
-          {isPending && pendingTimeLeft !== null && (
-            <p className="text-sm text-gray-500 text-center mt-2">
-              Tidbit will be posted in {pendingTimeLeft}s unless canceled.
-            </p>
-          )}
         </>
       )}
     </div>

@@ -63,15 +63,6 @@ export const Navbar = () => {
           <Link
             onPress={() => setIsMenuOpen(false)}
             className="text-[#660033]"
-            href="/settings/daily-update"
-          >
-            Daily Update
-          </Link>
-        </NavbarMenuItem>
-        <NavbarMenuItem>
-          <Link
-            onPress={() => setIsMenuOpen(false)}
-            className="text-[#660033]"
             href="/settings/connections"
           >
             Connections

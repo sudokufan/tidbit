@@ -2,32 +2,17 @@ import {useEffect, useState} from "react";
 import {doc, getDoc, setDoc, Timestamp} from "firebase/firestore";
 import {db, auth} from "../lib/firebase";
 import {useAuthState} from "react-firebase-hooks/auth";
-import {Preferences} from "@capacitor/preferences";
+import {
+  loadFeedFromLocalStorage,
+  saveFeedToLocalStorage,
+} from "@/helpers/localStorageFeed";
+import {Tidbit} from "@/types/tidbit";
+import {getTidbitFeed} from "@/helpers/getTidbitFeed";
 
 export const TidbitFeed = () => {
-  interface Tidbit {
-    id: string;
-    emoji: string;
-    username: string;
-    message: string;
-    timestamp: any;
-  }
-
   const [tidbits, setTidbits] = useState<Tidbit[]>([]);
   const [nextUpdate, setNextUpdate] = useState<string | null>(null);
   const [user] = useAuthState(auth);
-
-  const saveFeedToCache = async (userId: string, data: any) => {
-    await Preferences.set({
-      key: `dailyFeed_${userId}`,
-      value: JSON.stringify(data),
-    });
-  };
-
-  const loadFeedFromCache = async (userId: string) => {
-    const result = await Preferences.get({key: `dailyFeed_${userId}`});
-    return result.value ? JSON.parse(result.value) : null;
-  };
 
   useEffect(() => {
     if (!user) return;
@@ -36,9 +21,8 @@ export const TidbitFeed = () => {
       const userId = user.uid;
       const dailyFeedRef = doc(db, "dailyFeed", userId);
       const updateTimeRef = doc(db, "updateTimes", userId);
-      const connectionsRef = doc(db, "connections", userId);
 
-      const cachedFeed = await loadFeedFromCache(userId);
+      const cachedFeed = await loadFeedFromLocalStorage(userId);
 
       const updateTimeSnap = await getDoc(updateTimeRef);
       let updateTimeStr = updateTimeSnap.exists()
@@ -57,6 +41,7 @@ export const TidbitFeed = () => {
         : 0;
       const nextAllowedUpdate = updateTimeToday.getTime();
 
+      // If the feed was updated after the next allowed update time, use the cached feed
       if (cachedFeed?.lastUpdated >= nextAllowedUpdate) {
         console.log("🕰 Using cached daily feed.");
         setTidbits(cachedFeed.tidbits || []);
@@ -71,60 +56,26 @@ export const TidbitFeed = () => {
 
       console.log("🔄 Fetching new daily feed...");
 
-      const connectionsSnap = await getDoc(connectionsRef);
-      if (!connectionsSnap.exists()) {
-        console.warn("No connections found.");
-        await setDoc(dailyFeedRef, {tidbits: [], lastUpdated: Timestamp.now()});
-        setTidbits([]);
-        return;
-      }
-
-      const connections = connectionsSnap.data()?.connections || [];
-      if (connections.length === 0) {
-        console.warn("User has no connections.");
-        await setDoc(dailyFeedRef, {tidbits: [], lastUpdated: Timestamp.now()});
-        setTidbits([]);
-        return;
-      }
-
-      const tidbitsData: Tidbit[] = [];
-      await Promise.all(
-        connections.map(async (connectionId: string) => {
-          const tidbitRef = doc(db, "tidbits", connectionId);
-          const tidbitSnap = await getDoc(tidbitRef);
-
-          if (tidbitSnap.exists()) {
-            const tidbitTime = tidbitSnap.data().timestamp?.toMillis() ?? 0;
-            const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
-            if (tidbitTime >= twentyFourHoursAgo) {
-              tidbitsData.push({
-                id: connectionId,
-                emoji: tidbitSnap.data().emoji,
-                username: tidbitSnap.data().username,
-                message: tidbitSnap.data().message,
-                timestamp: tidbitSnap.data().timestamp,
-              });
-            }
-          }
-        }),
-      );
+      const tidbitsDailyFeed = await getTidbitFeed();
 
       if (
-        JSON.stringify(tidbitsData) !==
+        JSON.stringify(tidbitsDailyFeed) !==
         JSON.stringify(dailyFeedSnap.data()?.tidbits)
       ) {
         await setDoc(dailyFeedRef, {
-          tidbits: tidbitsData,
+          tidbits: tidbitsDailyFeed,
           lastUpdated: Timestamp.now(),
         });
       }
 
-      await saveFeedToCache(userId, {
-        tidbits: tidbitsData,
+      await saveFeedToLocalStorage(userId, {
+        tidbits: tidbitsDailyFeed,
         lastUpdated: Timestamp.now().toMillis(),
       });
 
-      setTidbits(tidbitsData);
+      if (tidbitsDailyFeed) {
+        setTidbits(tidbitsDailyFeed);
+      }
     };
 
     fetchFeed();

@@ -26,6 +26,11 @@ export const TidbitForm = () => {
   );
   const [pendingTimeLeft, setPendingTimeLeft] = useState<number | null>(null);
 
+  //   • Subscribes to a Firestore “tidbits” document for the current user.
+  // • Whenever this doc changes, we read its data (like emoji, message, and timestamp).
+  // • If there’s a valid timestamp within the past 24 hours, we calculate how much time is left until the user can post again, disable posting if necessary, and store that time.
+  // • If the 24 hours are already up (or there’s no timestamp), we enable posting.
+  // • On cleanup, it stops listening to Firestore.
   useEffect(() => {
     if (!auth.currentUser) return;
 
@@ -57,6 +62,10 @@ export const TidbitForm = () => {
     return () => unsubscribe();
   }, [auth.currentUser]);
 
+  // • Looks at a “lastTimestamp” (when the user last posted).
+  // • Calculates the remaining 24-hour window.
+  // • If that time is up, posting is allowed. Otherwise, we keep track of how many milliseconds remain.
+  // • It updates every second via setInterval to give a live countdown.
   useEffect(() => {
     if (!lastTimestamp) return;
 
@@ -78,6 +87,10 @@ export const TidbitForm = () => {
     return () => clearInterval(interval);
   }, [lastTimestamp]);
 
+  // this is the useEffect that:
+  // • Watches whether we’re in a “pending” state and if we have a pending countdown running.
+  // • If so, it sets up a 1-second interval, decreasing that counter each second.
+  // • Once the time hits zero (or we manually stop it), we clear out that timer.
   useEffect(() => {
     if (!isPending || pendingTimeLeft === null) return;
 
@@ -88,6 +101,9 @@ export const TidbitForm = () => {
     return () => clearInterval(interval);
   }, [isPending]);
 
+  //   • Gathers the current user’s ID and looks up the user’s name in Firestore (defaulting to “Unknown”).
+  // • Creates or updates a “tidbits” doc with the user’s ID, name, chosen emoji, message, and a new timestamp.
+  // • Resets the local state to indicate we’ve just posted: clears out the message, sets the cooldown timer back to 24 hours, disables future posts, and resets any pending states.
   const confirmPostTidbit = async () => {
     if (!auth.currentUser) return;
 
@@ -119,6 +135,9 @@ export const TidbitForm = () => {
     setPendingTimeLeft(null);
   };
 
+  // • Checks if posting is allowed. If it is, we begin a 30-second “pending” window (like a final confirmation countdown).
+  // • After 30 seconds, confirmPostTidbit is called automatically.
+  // • If we bail early, we can clear that timeout so we don’t accidentally post anyway.
   const postTidbit = () => {
     if (!canPost) return;
 

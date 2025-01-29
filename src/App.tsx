@@ -1,7 +1,5 @@
 import {Route, Routes, Navigate} from "react-router-dom";
 import {Auth} from "./components/auth";
-import {TidbitForm} from "./components/tidbitForm";
-import {TidbitFeed} from "./components/tidbitFeed";
 import {DailyUpdateSettings} from "./components/dailyUpdateSettings";
 import {ConnectionList} from "./components/connectionList";
 import {InviteLinkGenerator} from "./components/inviteLinkGenerator";
@@ -10,6 +8,7 @@ import {auth} from "./lib/firebase";
 import {useAuthState} from "react-firebase-hooks/auth";
 import {Profile} from "./components/profile";
 import {Navbar} from "./components/navbar";
+import IndexPage from "./pages";
 
 function App() {
   const [user] = useAuthState(auth);
@@ -24,16 +23,7 @@ function App() {
         />
         <Route
           path="/dashboard"
-          element={
-            user ? (
-              <div className="flex flex-col items-center p-4">
-                <TidbitForm />
-                <TidbitFeed />
-              </div>
-            ) : (
-              <Navigate to="/" />
-            )
-          }
+          element={user ? <IndexPage /> : <Navigate to="/" />}
         />
         <Route
           path="/profile"

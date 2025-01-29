@@ -20,7 +20,7 @@ export const InviteLinkGenerator = () => {
       {inviteLink && (
         <div className="mt-4">
           <p className="text-sm text-gray-600">
-            Share this link (valid for 24 hours):
+            Share this link (valid for 7 days):
           </p>
           <a
             href={inviteLink}

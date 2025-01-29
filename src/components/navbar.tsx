@@ -33,11 +33,6 @@ export const Navbar = () => {
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link className="text-white" href="/settings/daily-update">
-            Daily Update
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
           <Link className="text-white" href="/settings/connections">
             Connections
           </Link>

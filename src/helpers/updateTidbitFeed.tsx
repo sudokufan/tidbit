@@ -1,14 +1,16 @@
 import {auth, db} from "@/lib/firebase";
 import {Tidbit} from "@/types/tidbit";
 import {doc, getDoc, setDoc, Timestamp} from "firebase/firestore";
-import {useAuthState} from "react-firebase-hooks/auth";
+import {saveFeedToLocalStorage} from "./localStorageFeed";
 
-export const getTidbitFeed = async () => {
-  const [user] = useAuthState(auth);
+export const updateTidbitFeed = async () => {
+  const user = auth.currentUser;
   if (!user) return;
   const userId = user.uid;
   const connectionsRef = doc(db, "connections", userId);
   const dailyFeedRef = doc(db, "dailyFeed", userId);
+
+  const dailyFeedSnap = await getDoc(dailyFeedRef);
 
   const connectionsSnap = await getDoc(connectionsRef);
   if (!connectionsSnap.exists()) {
@@ -45,6 +47,21 @@ export const getTidbitFeed = async () => {
       }
     }),
   );
+
+  if (
+    JSON.stringify(tidbitsData) !==
+    JSON.stringify(dailyFeedSnap.data()?.tidbits)
+  ) {
+    await setDoc(dailyFeedRef, {
+      tidbits: tidbitsData,
+      lastUpdated: Timestamp.now(),
+    });
+  }
+
+  await saveFeedToLocalStorage(userId, {
+    tidbits: tidbitsData,
+    lastUpdated: Timestamp.now().toMillis(),
+  });
 
   return tidbitsData;
 };

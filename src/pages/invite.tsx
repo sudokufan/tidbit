@@ -22,7 +22,6 @@ export const Invite = () => {
     console.log("Waiting for auth.currentUser...");
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log("User signed in:", user.uid);
         handleInvite(user);
       }
     });

@@ -1,6 +1,5 @@
 import {Route, Routes, Navigate} from "react-router-dom";
 import {Auth} from "./components/auth";
-import {DailyUpdateSettings} from "./components/dailyUpdateSettings";
 import {ConnectionList} from "./components/connectionList";
 import {InviteLinkGenerator} from "./components/inviteLinkGenerator";
 import {Invite} from "./pages/invite";
@@ -28,10 +27,6 @@ function App() {
         <Route
           path="/profile"
           element={user ? <Profile /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/settings/daily-update"
-          element={user ? <DailyUpdateSettings /> : <Navigate to="/" />}
         />
         <Route
           path="/settings/connections"

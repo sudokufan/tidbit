@@ -8,8 +8,13 @@ import {
 } from "firebase/firestore";
 import {db, auth} from "../lib/firebase";
 import EmojiPicker from "emoji-picker-react";
+import {updateTidbitFeed} from "@/helpers/updateTidbitFeed";
 
-export const TidbitForm = () => {
+type TidbitFormProps = {
+  onPostConfirm?: () => void;
+};
+
+export const TidbitForm = ({onPostConfirm}: TidbitFormProps) => {
   const [message, setMessage] = useState("");
   const [emoji, setEmoji] = useState("🎉");
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -125,6 +130,9 @@ export const TidbitForm = () => {
       message,
       timestamp: serverTimestamp(),
     });
+
+    await updateTidbitFeed();
+    onPostConfirm?.();
 
     setLatestTidbit({emoji, message});
     setMessage("");

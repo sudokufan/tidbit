@@ -1,8 +1,11 @@
 import {useEffect, useState} from "react";
-import {doc, getDoc} from "firebase/firestore";
+import {doc, getDoc, Timestamp} from "firebase/firestore";
 import {db, auth} from "../lib/firebase";
 import {useAuthState} from "react-firebase-hooks/auth";
-import {loadFeedFromLocalStorage} from "@/helpers/localStorageFeed";
+import {
+  loadFeedFromLocalStorage,
+  saveFeedToLocalStorage,
+} from "@/helpers/localStorageFeed";
 import {Tidbit} from "@/types/tidbit";
 
 type TidbitFeedProps = {
@@ -20,18 +23,23 @@ export const TidbitFeed = ({refresh}: TidbitFeedProps) => {
       const userId = user.uid;
       const cachedFeed = await loadFeedFromLocalStorage(userId);
 
-      if (cachedFeed) {
+      const tidbitTime = cachedFeed.lastUpdated;
+      const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
+
+      if (cachedFeed && tidbitTime >= twentyFourHoursAgo) {
         console.log("🕰 Using localStorage daily feed.");
         setTidbits(cachedFeed.tidbits || []);
         return;
-      }
-
-      const dailyFeedRef = doc(db, "dailyFeed", userId);
-      const dailyFeedSnap = await getDoc(dailyFeedRef);
-
-      if (!cachedFeed) {
+      } else {
+        const dailyFeedRef = doc(db, "dailyFeed", userId);
+        const dailyFeedSnap = await getDoc(dailyFeedRef);
         console.log("🕰 Using Firestore daily feed.");
         setTidbits(dailyFeedSnap.data()?.tidbits || []);
+        saveFeedToLocalStorage(userId, {
+          tidbits: dailyFeedSnap.data()?.tidbits,
+          lastUpdated: Timestamp.now().toMillis(),
+        });
+
         return;
       }
     };

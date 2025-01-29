@@ -83,7 +83,6 @@ export const Profile = () => {
         deleteDoc(doc(db, "users", userId)),
         deleteDoc(doc(db, "tidbits", userId)),
         deleteDoc(doc(db, "dailyFeed", userId)),
-        deleteDoc(doc(db, "updateTimes", userId)),
         deleteDoc(doc(db, "connections", userId)),
       ]);
 

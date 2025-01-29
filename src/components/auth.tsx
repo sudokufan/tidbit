@@ -20,16 +20,10 @@ export const Auth = () => {
     email: string | null,
   ) => {
     const userConnectionsRef = doc(db, "connections", userId);
-    const userUpdateTimesRef = doc(db, "updateTimes", userId);
 
     const userConnectionsSnap = await getDoc(userConnectionsRef);
     if (!userConnectionsSnap.exists()) {
       await setDoc(userConnectionsRef, {connections: []});
-    }
-
-    const userUpdateTimesSnap = await getDoc(userUpdateTimesRef);
-    if (!userUpdateTimesSnap.exists()) {
-      await setDoc(userUpdateTimesRef, {updateTime: "12:00"});
     }
 
     const userProfileRef = doc(db, "users", userId);

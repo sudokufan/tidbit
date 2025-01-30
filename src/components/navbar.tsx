@@ -14,7 +14,7 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <HeroUINavbar isMenuOpen={isMenuOpen} className="text-white bg-[#660033]">
+    <HeroUINavbar isMenuOpen={isMenuOpen} className="text-white bg-burgundy">
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -53,7 +53,7 @@ export const Navbar = () => {
         <NavbarMenuItem>
           <Link
             onPress={() => setIsMenuOpen(false)}
-            className="text-[#660033]"
+            className="text-burgundy"
             href="/dashboard"
           >
             Dashboard
@@ -62,7 +62,7 @@ export const Navbar = () => {
         <NavbarMenuItem>
           <Link
             onPress={() => setIsMenuOpen(false)}
-            className="text-[#660033]"
+            className="text-burgundy"
             href="/settings/connections"
           >
             Connections
@@ -71,7 +71,7 @@ export const Navbar = () => {
         <NavbarMenuItem>
           <Link
             onPress={() => setIsMenuOpen(false)}
-            className="text-[#660033]"
+            className="text-burgundy"
             href="/settings/invite"
           >
             Invite
@@ -80,7 +80,7 @@ export const Navbar = () => {
         <NavbarMenuItem>
           <Link
             onPress={() => setIsMenuOpen(false)}
-            className="text-[#660033]"
+            className="text-burgundy"
             href="/profile"
           >
             Profile

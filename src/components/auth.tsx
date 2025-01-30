@@ -7,11 +7,12 @@ import {
 } from "firebase/auth";
 import {doc, setDoc, getDoc} from "firebase/firestore";
 import {auth, db} from "../lib/firebase";
+import {Input, Button} from "@heroui/react";
 
 export const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(true);
 
   const ensureUserDocuments = async (userId: string) => {
     const userConnectionsRef = doc(db, "connections", userId);
@@ -57,29 +58,30 @@ export const Auth = () => {
   return (
     <div className="p-4">
       <div>
-        <input
+        <Input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border p-2 rounded w-full"
+          className="w-full mb-2"
         />
-        <input
+        <Input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 rounded w-full mt-2"
+          className="w-full mb-2"
         />
-        <button
+        <Button
           onClick={handleEmailAuth}
-          className="bg-blue-500 text-white px-4 py-2 rounded w-full mt-2"
+          color="primary"
+          className="w-full mb-2"
         >
           {isSignUp ? "Sign Up" : "Log In"}
-        </button>
+        </Button>
         <p
           onClick={() => setIsSignUp(!isSignUp)}
-          className="text-sm text-blue-500 underline cursor-pointer mt-2"
+          className="text-sm text-blue-500 underline cursor-pointer"
         >
           {isSignUp
             ? "Already have an account? Log In"
@@ -87,12 +89,9 @@ export const Auth = () => {
         </p>
       </div>
       <hr className="my-4" />
-      <button
-        onClick={handleGoogleSignIn}
-        className="bg-red-500 text-white px-4 py-2 rounded w-full"
-      >
+      <Button onClick={handleGoogleSignIn} color="danger" className="w-full">
         Sign in with Google
-      </button>
+      </Button>
     </div>
   );
 };

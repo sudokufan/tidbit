@@ -20,7 +20,7 @@ const Tidbit: React.FC<TidbitItemProps> = ({tidbit, formatTimeLeft}) => {
         <div className="flex-1">
           <div className="flex gap-2 items-baseline mb-1">
             <span className="text-md font-semibold">{tidbit.username}</span>
-            <span className="text-small text-default-500">{timeSince}</span>
+            <span className="text-xs text-default-400">{timeSince}</span>
           </div>
           <p className="text-default-700">{tidbit.message}</p>
           {formatTimeLeft && (

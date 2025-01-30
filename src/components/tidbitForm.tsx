@@ -154,7 +154,7 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
             </button>
 
             {showEmojiPicker && (
-              <div className="absolute top-20 left-0 z-50">
+              <div className="absolute top-20 -left-3 z-50">
                 <EmojiPicker
                   onEmojiClick={(event) => {
                     setEmoji(event.emoji);

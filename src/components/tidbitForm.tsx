@@ -142,7 +142,7 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
   return (
     <>
       {latestTidbit && timeLeft !== null && timeLeft > 0 ? (
-        <div className="max-w-[1062px] mb-8 px-4 w-full">
+        <div className="max-w-[1055px] mb-8 px-4 w-full">
           <Tidbit tidbit={latestTidbit} formatTimeLeft={formatTimeLeft} />
         </div>
       ) : (

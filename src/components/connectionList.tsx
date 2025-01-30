@@ -64,22 +64,20 @@ export const ConnectionList = () => {
 
   return (
     <div className="p-4 bg-burgundy text-white">
-      <h2 className="text-lg font-bold mb-2">Connections</h2>
       {connections.length === 0 ? (
         <p>No connections yet</p>
       ) : (
         connections.map((connection) => (
-          <div
-            key={connection.id}
-            className="flex justify-between items-center p-2 border-b"
-          >
-            <span>{connection.name}</span>
-            <button
-              onClick={() => removeConnection(connection.id)}
-              className="bg-gold text-black px-4 py-2 rounded"
-            >
-              Remove
-            </button>
+          <div key={connection.id} className="w-full flex justify-center">
+            <div className="flex justify-between items-center p-2 border-b w-full xl:max-w-xl md:max-w-lg max-w-sm">
+              <span>{connection.name}</span>
+              <button
+                onClick={() => removeConnection(connection.id)}
+                className="bg-gold text-black px-4 py-2 rounded"
+              >
+                Remove
+              </button>
+            </div>
           </div>
         ))
       )}

@@ -43,8 +43,8 @@ export const Navbar = () => {
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link className="text-white" href="/profile">
-            Profile
+          <Link className="text-white" href="/settings">
+            Settings
           </Link>
         </NavbarItem>
       </NavbarContent>
@@ -81,9 +81,9 @@ export const Navbar = () => {
           <Link
             onPress={() => setIsMenuOpen(false)}
             className="text-burgundy"
-            href="/profile"
+            href="/settings"
           >
-            Profile
+            Settings
           </Link>
         </NavbarMenuItem>
       </NavbarMenu>

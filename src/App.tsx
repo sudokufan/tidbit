@@ -5,7 +5,7 @@ import {InviteLinkGenerator} from "./components/inviteLinkGenerator";
 import {Invite} from "./pages/invite";
 import {auth} from "./lib/firebase";
 import {useAuthState} from "react-firebase-hooks/auth";
-import {Profile} from "./components/profile";
+import {Settings} from "./components/settings";
 import {Navbar} from "./components/navbar";
 import IndexPage from "./pages";
 
@@ -13,7 +13,7 @@ function App() {
   const [user] = useAuthState(auth);
 
   return (
-    <>
+    <div style={{backgroundColor: "#660033", minHeight: "100vh"}}>
       {user && <Navbar />}
       <Routes>
         <Route
@@ -25,8 +25,8 @@ function App() {
           element={user ? <IndexPage /> : <Navigate to="/" />}
         />
         <Route
-          path="/profile"
-          element={user ? <Profile /> : <Navigate to="/" />}
+          path="/settings"
+          element={user ? <Settings /> : <Navigate to="/" />}
         />
         <Route
           path="/settings/connections"
@@ -38,7 +38,7 @@ function App() {
         />
         <Route path="/invite/:inviteId" element={<Invite />} />
       </Routes>
-    </>
+    </div>
   );
 }
 

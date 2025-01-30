@@ -72,16 +72,12 @@ export const Auth = () => {
           onChange={(e) => setPassword(e.target.value)}
           className="w-full mb-2"
         />
-        <Button
-          onClick={handleEmailAuth}
-          color="primary"
-          className="w-full mb-2"
-        >
+        <Button onClick={handleEmailAuth} className="w-full mb-2 bg-[#FFC107]">
           {isSignUp ? "Sign Up" : "Log In"}
         </Button>
         <p
           onClick={() => setIsSignUp(!isSignUp)}
-          className="text-sm text-blue-500 underline cursor-pointer"
+          className="text-sm text-gold underline cursor-pointer"
         >
           {isSignUp
             ? "Already have an account? Log In"
@@ -89,7 +85,7 @@ export const Auth = () => {
         </p>
       </div>
       <hr className="my-4" />
-      <Button onClick={handleGoogleSignIn} color="danger" className="w-full">
+      <Button onClick={handleGoogleSignIn} className="w-full bg-[#FF5252]">
         Sign in with Google
       </Button>
     </div>

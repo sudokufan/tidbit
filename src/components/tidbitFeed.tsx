@@ -6,15 +6,18 @@ import {
   loadFeedFromLocalStorage,
   saveFeedToLocalStorage,
 } from "@/helpers/localStorageFeed";
-import {Tidbit} from "@/types/tidbit";
+import {TidbitType} from "@/types/tidbit";
+import Tidbit from "./tidbit";
 
 type TidbitFeedProps = {
   refresh: boolean;
 };
 
 export const TidbitFeed = ({refresh}: TidbitFeedProps) => {
-  const [tidbits, setTidbits] = useState<Tidbit[]>([]);
+  const [tidbits, setTidbits] = useState<TidbitType[]>([]);
   const [user] = useAuthState(auth);
+  // const [sortCriteria, setSortCriteria] = useState<"time" | "username">("time");
+  const sortCriteria = "time";
 
   useEffect(() => {
     if (!user) return;
@@ -49,23 +52,43 @@ export const TidbitFeed = ({refresh}: TidbitFeedProps) => {
     fetchFeed();
   }, [user, refresh]);
 
+  const sortTidbits = (tidbits: TidbitType[]) => {
+    return tidbits.sort((a, b) => {
+      if (sortCriteria === "time") {
+        return b.timestamp.seconds - a.timestamp.seconds;
+      } else {
+        return a.username.localeCompare(b.username);
+      }
+    });
+  };
+
   if (!user) return <p>Please log in to see Tidbits.</p>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 flex flex-col gap-2">
+      {/* // add sorting by username or time to settings, defaults to time oldest to newest atm */}
+      {/* <div className="flex justify-end mb-4">
+        <Select
+          label="Sort by"
+          selectedKeys={[sortCriteria]}
+          onSelectionChange={(keys) =>
+            setSortCriteria(keys.currentKey as "time" | "username")
+          }
+          className="w-[120px]"
+        >
+          <SelectItem key="time" value="time">
+            Time
+          </SelectItem>
+          <SelectItem key="username" value="username">
+            Username
+          </SelectItem>
+        </Select>
+      </div> */}
       {tidbits.length === 0 ? (
-        <p>No Tidbits from your connections yet.</p>
+        <p className="text-white">No Tidbits from your connections yet.</p>
       ) : (
-        tidbits.map((tidbit) => (
-          <div
-            key={tidbit.id}
-            className="p-4 border-b bg-white shadow-md rounded-lg"
-          >
-            <p className="text-lg">
-              {tidbit.emoji} <strong>{tidbit.username}</strong>
-            </p>
-            <p className="text-gray-700">{tidbit.message}</p>
-          </div>
+        sortTidbits(tidbits).map((tidbit) => (
+          <Tidbit key={tidbit.id} tidbit={tidbit} />
         ))
       )}
     </div>

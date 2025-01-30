@@ -10,23 +10,21 @@ export const InviteLinkGenerator = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 bg-burgundy text-white">
       <button
         onClick={handleGenerateLink}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
+        className="bg-gold text-black px-4 py-2 rounded"
       >
         Generate Invite Link
       </button>
       {inviteLink && (
         <div className="mt-4">
-          <p className="text-sm text-gray-600">
-            Share this link (valid for 7 days):
-          </p>
+          <p className="text-sm">Share this link (valid for 7 days):</p>
           <a
             href={inviteLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-500 underline"
+            className="text-gold underline"
           >
             {inviteLink}
           </a>

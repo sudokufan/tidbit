@@ -17,8 +17,13 @@ export const removeConnection = async (connectionId: string) => {
 
   const userId = auth.currentUser.uid;
   const userConnectionsRef = doc(db, "connections", userId);
+  const connectionUserRef = doc(db, "connections", connectionId);
 
   await updateDoc(userConnectionsRef, {
     connections: arrayRemove(connectionId),
+  });
+
+  await updateDoc(connectionUserRef, {
+    connections: arrayRemove(userId),
   });
 };

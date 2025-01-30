@@ -1,5 +1,5 @@
 import {auth, db} from "@/lib/firebase";
-import {Tidbit} from "@/types/tidbit";
+import {TidbitType} from "@/types/tidbit";
 import {doc, getDoc, setDoc, Timestamp} from "firebase/firestore";
 import {saveFeedToLocalStorage} from "./localStorageFeed";
 
@@ -26,7 +26,7 @@ export const updateTidbitFeed = async () => {
     return;
   }
 
-  const tidbitsData: Tidbit[] = [];
+  const tidbitsData: TidbitType[] = [];
   await Promise.all(
     connections.map(async (connectionId: string) => {
       const tidbitRef = doc(db, "tidbits", connectionId);

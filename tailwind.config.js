@@ -13,6 +13,7 @@ module.exports = {
     extend: {
       colors: {
         burgundy: "#660033",
+        gold: "#F5E1A4",
       },
     },
   },

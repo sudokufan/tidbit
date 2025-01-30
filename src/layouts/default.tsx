@@ -1,12 +1,8 @@
-import { Link } from "@heroui/link";
+import {Link} from "@heroui/link";
 
-import { Navbar } from "@/components/navbar";
+import {Navbar} from "@/components/navbar";
 
-export default function DefaultLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DefaultLayout({children}: {children: React.ReactNode}) {
   return (
     <div className="relative flex flex-col h-screen">
       <Navbar />

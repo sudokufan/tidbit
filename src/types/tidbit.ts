@@ -1,5 +1,5 @@
-export interface Tidbit {
-  id: string;
+export interface TidbitType {
+  id?: string;
   emoji: string;
   username: string;
   message: string;

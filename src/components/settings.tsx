@@ -13,7 +13,7 @@ import {
 import {useAuthState} from "react-firebase-hooks/auth";
 import {EmailAuthProvider, reauthenticateWithCredential} from "firebase/auth";
 
-export const Profile = () => {
+export const Settings = () => {
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
@@ -130,31 +130,27 @@ export const Profile = () => {
   if (!user) return <p>Please log in to manage your profile.</p>;
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h2 className="text-lg font-bold mb-2">Profile Settings</h2>
-
-      <div className="mb-4">
-        <label className="block text-sm font-semibold mb-1">
-          Display name:
-        </label>
+    <div className="p-4 max-w-4xl mx-auto bg-burgundy text-white">
+      <div className="mb-8">
+        <label className="block text-sm font-semibold mb-1">Display name</label>
         <input
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="border p-2 rounded w-full"
+          className="border p-2 rounded w-full text-black"
         />
         <button
           onClick={updateUsername}
           disabled={loading}
-          className="mt-2 bg-blue-500 text-white px-4 py-2 rounded w-full"
+          className="mt-2 bg-gold text-black px-4 py-2 rounded w-full"
         >
-          Update Username
+          Update Display Name
         </button>
       </div>
-
+      <label className="block text-sm font-semibold mb-1">Delete account</label>
       <button
         onClick={deleteAccount}
-        className="bg-red-500 text-white px-4 py-2 rounded w-full"
+        className="bg-[#FF5252] text-white px-4 py-2 rounded w-full"
       >
         Delete Account
       </button>

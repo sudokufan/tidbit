@@ -56,38 +56,40 @@ export const Auth = () => {
   };
 
   return (
-    <div className="p-4">
-      <div>
-        <Input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-2"
-        />
-        <Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-2"
-        />
-        <Button onClick={handleEmailAuth} className="w-full mb-2 bg-[#FFC107]">
-          {isSignUp ? "Sign Up" : "Log In"}
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="mx-[10vh] md:mx-[20vh] lg:mx-[40vh] xl:mx-[60vh] w-full">
+        <div>
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full mb-2"
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full mb-2"
+          />
+          <Button onClick={handleEmailAuth} className="w-full mb-2 bg-gold">
+            {isSignUp ? "Sign Up" : "Log In"}
+          </Button>
+          <p
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="text-sm text-gold underline cursor-pointer"
+          >
+            {isSignUp
+              ? "Already have an account? Log In"
+              : "Don't have an account? Sign Up"}
+          </p>
+        </div>
+        <hr className="my-4" />
+        <Button onClick={handleGoogleSignIn} className="w-full bg-[#FF5252]">
+          Sign in with Google
         </Button>
-        <p
-          onClick={() => setIsSignUp(!isSignUp)}
-          className="text-sm text-gold underline cursor-pointer"
-        >
-          {isSignUp
-            ? "Already have an account? Log In"
-            : "Don't have an account? Sign Up"}
-        </p>
       </div>
-      <hr className="my-4" />
-      <Button onClick={handleGoogleSignIn} className="w-full bg-[#FF5252]">
-        Sign in with Google
-      </Button>
     </div>
   );
 };

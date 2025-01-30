@@ -38,6 +38,7 @@ export const Navbar = () => {
     <HeroUINavbar
       isMenuOpen={isMenuOpen}
       className="text-white items-baseline bg-burgundy"
+      classNames={{wrapper: "px-0"}}
     >
       <NavbarContent>
         <NavbarMenuToggle

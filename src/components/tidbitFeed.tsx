@@ -23,25 +23,27 @@ export const TidbitFeed = ({refresh}: TidbitFeedProps) => {
       const userId = user.uid;
       const cachedFeed = await loadFeedFromLocalStorage(userId);
 
-      const tidbitTime = cachedFeed.lastUpdated;
-      const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
+      if (cachedFeed && cachedFeed.lastUpdated) {
+        const tidbitTime = cachedFeed.lastUpdated;
+        const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
 
-      if (cachedFeed && tidbitTime >= twentyFourHoursAgo) {
-        console.log("🕰 Using localStorage daily feed.");
-        setTidbits(cachedFeed.tidbits || []);
-        return;
-      } else {
-        const dailyFeedRef = doc(db, "dailyFeed", userId);
-        const dailyFeedSnap = await getDoc(dailyFeedRef);
-        console.log("🕰 Using Firestore daily feed.");
-        setTidbits(dailyFeedSnap.data()?.tidbits || []);
-        await saveFeedToLocalStorage(userId, {
-          tidbits: dailyFeedSnap.data()?.tidbits,
-          lastUpdated: Timestamp.now().toMillis(),
-        });
-
-        return;
+        if (tidbitTime >= twentyFourHoursAgo) {
+          console.log("🕰 Using localStorage daily feed.");
+          setTidbits(cachedFeed.tidbits || []);
+          return;
+        }
       }
+
+      const dailyFeedRef = doc(db, "dailyFeed", userId);
+      const dailyFeedSnap = await getDoc(dailyFeedRef);
+      console.log("🕰 Using Firestore daily feed.");
+      setTidbits(dailyFeedSnap.data()?.tidbits || []);
+      await saveFeedToLocalStorage(userId, {
+        tidbits: dailyFeedSnap.data()?.tidbits,
+        lastUpdated: Timestamp.now().toMillis(),
+      });
+
+      return;
     };
 
     fetchFeed();

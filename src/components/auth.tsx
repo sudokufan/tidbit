@@ -12,29 +12,14 @@ export const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
-  const [name, setName] = useState("");
 
-  const ensureUserDocuments = async (
-    userId: string,
-    name: string | null,
-    email: string | null,
-  ) => {
+  const ensureUserDocuments = async (userId: string, email: string | null) => {
     const userConnectionsRef = doc(db, "connections", userId);
 
     const userConnectionsSnap = await getDoc(userConnectionsRef);
     if (!userConnectionsSnap.exists()) {
       await setDoc(userConnectionsRef, {connections: []});
     }
-
-    const userProfileRef = doc(db, "users", userId);
-    await setDoc(
-      userProfileRef,
-      {
-        name: name || "Unknown",
-        email: email || "",
-      },
-      {merge: true},
-    );
   };
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
@@ -42,7 +27,7 @@ export const Auth = () => {
     const user = userCredential.user;
 
     if (user) {
-      await ensureUserDocuments(user.uid, user.displayName, user.email);
+      await ensureUserDocuments(user.uid, user.email);
     }
   };
 
@@ -65,22 +50,13 @@ export const Auth = () => {
     }
 
     if (user) {
-      await ensureUserDocuments(user.uid, isSignUp ? name : null, user.email);
+      await ensureUserDocuments(user.uid, user.email);
     }
   };
 
   return (
     <div className="p-4">
       <div>
-        {isSignUp && (
-          <input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="border p-2 rounded w-full mt-2"
-          />
-        )}
         <input
           type="email"
           placeholder="Email"

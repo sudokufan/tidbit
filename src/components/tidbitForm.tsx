@@ -12,9 +12,10 @@ import {updateTidbitFeed} from "@/helpers/updateTidbitFeed";
 
 type TidbitFormProps = {
   onPostConfirm?: () => void;
+  disabled: boolean;
 };
 
-export const TidbitForm = ({onPostConfirm}: TidbitFormProps) => {
+export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
   const [message, setMessage] = useState("");
   const [emoji, setEmoji] = useState("🎉");
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -97,12 +98,7 @@ export const TidbitForm = ({onPostConfirm}: TidbitFormProps) => {
     const tidbitRef = doc(db, "tidbits", userId);
     const userRef = doc(db, "users", userId);
     const userSnap = await getDoc(userRef);
-
-    let username = "Unknown";
-
-    if (userSnap.exists()) {
-      username = userSnap.data().name;
-    }
+    const username = userSnap.data()?.name;
 
     await setDoc(tidbitRef, {
       userId,
@@ -161,7 +157,10 @@ export const TidbitForm = ({onPostConfirm}: TidbitFormProps) => {
 
             <input
               type="text"
-              placeholder="What's your tidbit?"
+              placeholder={
+                disabled ? "Set your display name!" : "Share your tidbit"
+              }
+              disabled={disabled}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               className="flex-1 border p-2 rounded"

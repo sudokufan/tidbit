@@ -44,9 +44,7 @@ export const Navbar = () => {
         <NavbarBrand>
           <span className="font-semibold text-gold text-xl">tidbit</span>
         </NavbarBrand>
-        <span className="sm:hidden block w-full text-center">
-          {getPageTitle()}
-        </span>
+        <h1 className="sm:hidden block w-full text-center">{getPageTitle()}</h1>
 
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}

@@ -35,17 +35,22 @@ export const Navbar = () => {
   };
 
   return (
-    <HeroUINavbar isMenuOpen={isMenuOpen} className="text-white bg-burgundy">
+    <HeroUINavbar
+      isMenuOpen={isMenuOpen}
+      className="text-white items-baseline bg-burgundy"
+    >
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="sm:hidden"
           onPress={() => setIsMenuOpen(!isMenuOpen)}
         />
-        <NavbarBrand>
-          {/* You can add your logo or brand name here */}
-          <span className="sm:hidden flex justify-center w-full">
+        <NavbarBrand className="flex flex-row-reverse sm:flex-row justify-between w-full sm:w-auto">
+          <span className="sm:hidden flex justify-left sm:justify-center w-full order-2">
             {getPageTitle()}
+          </span>
+          <span className="font-semibold text-gold text-xl order-1 sm:order-none">
+            tidbit
           </span>
         </NavbarBrand>
       </NavbarContent>

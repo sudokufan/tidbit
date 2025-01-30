@@ -11,6 +11,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        default: ["Nunito", "sans-serif"],
+      },
       colors: {
         burgundy: "#660033",
         gold: "#F5E1A4",

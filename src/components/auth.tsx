@@ -58,7 +58,11 @@ export const Auth = () => {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="mx-[10vh] md:mx-[20vh] lg:mx-[40vh] xl:mx-[60vh] w-full">
-        <div>
+        <div className="flex flex-col text-gold font-bold">
+          <span className="text-5xl">tidbit</span>
+          <span className="text-md">connected, not distracted</span>
+        </div>
+        <div className="mt-4">
           <Input
             type="email"
             placeholder="Email"

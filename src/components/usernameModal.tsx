@@ -34,7 +34,7 @@ export default function UsernameModal({
       hideCloseButton
     >
       <ModalContent>
-        {(onClose) => (
+        {() => (
           <>
             <ModalHeader className="flex flex-col gap-1">
               What's your name?

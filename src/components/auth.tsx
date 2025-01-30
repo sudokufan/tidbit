@@ -13,7 +13,7 @@ export const Auth = () => {
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
 
-  const ensureUserDocuments = async (userId: string, email: string | null) => {
+  const ensureUserDocuments = async (userId: string) => {
     const userConnectionsRef = doc(db, "connections", userId);
 
     const userConnectionsSnap = await getDoc(userConnectionsRef);
@@ -27,7 +27,7 @@ export const Auth = () => {
     const user = userCredential.user;
 
     if (user) {
-      await ensureUserDocuments(user.uid, user.email);
+      await ensureUserDocuments(user.uid);
     }
   };
 
@@ -50,7 +50,7 @@ export const Auth = () => {
     }
 
     if (user) {
-      await ensureUserDocuments(user.uid, user.email);
+      await ensureUserDocuments(user.uid);
     }
   };
 

@@ -39,7 +39,7 @@ export const Profile = () => {
     const userRef = doc(db, "users", user.uid);
     await setDoc(userRef, {name: username}, {merge: true});
 
-    alert("Username updated!");
+    alert("Display name updated!");
     setLoading(false);
   };
 
@@ -134,7 +134,9 @@ export const Profile = () => {
       <h2 className="text-lg font-bold mb-2">Profile Settings</h2>
 
       <div className="mb-4">
-        <label className="block text-sm font-semibold mb-1">Username:</label>
+        <label className="block text-sm font-semibold mb-1">
+          Display name:
+        </label>
         <input
           type="text"
           value={username}

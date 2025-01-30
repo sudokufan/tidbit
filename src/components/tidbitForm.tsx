@@ -10,6 +10,7 @@ import {db, auth} from "../lib/firebase";
 import EmojiPicker from "emoji-picker-react";
 import {updateTidbitFeed} from "@/helpers/updateTidbitFeed";
 import Tidbit from "./tidbit";
+import {Textarea} from "@heroui/react";
 
 type TidbitFormProps = {
   onPostConfirm?: () => void;
@@ -26,7 +27,7 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
     emoji: string;
     message: string;
     username: string;
-    timestamp: {toMillis: () => number};
+    timestamp: {seconds: number; nanoseconds: number};
   } | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -121,7 +122,8 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
       message,
       username,
       timestamp: {
-        toMillis: () => new Date().getTime(),
+        seconds: Math.floor(Date.now() / 1000),
+        nanoseconds: (Date.now() % 1000) * 1000000,
       },
     });
     setMessage("");
@@ -164,15 +166,15 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
               </div>
             )}
 
-            <input
-              type="text"
+            <Textarea
               placeholder={
                 disabled ? "Set your display name!" : "Share your tidbit"
               }
-              disabled={disabled}
+              isDisabled={disabled}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="flex-1 border p-2 rounded"
+              className="flex-1"
+              minRows={1}
             />
             <button
               onClick={confirmPostTidbit}

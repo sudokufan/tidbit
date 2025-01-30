@@ -32,12 +32,12 @@ export default function UsernameModal({
       isKeyboardDismissDisabled
       onClose={onClose}
       hideCloseButton
-      className="bg-burgundy text-white"
+      className="bg-burgundy text-gray-200"
     >
       <ModalContent>
         {() => (
           <>
-            <ModalHeader className="flex flex-col gap-1">
+            <ModalHeader className="flex text-gold flex-col gap-1">
               What's your name?
             </ModalHeader>
             <ModalBody>
@@ -51,9 +51,9 @@ export default function UsernameModal({
                   key="1"
                   aria-label="Why do you want to know my name?"
                   title="Why do you want to know my name?"
-                  classNames={{title: "text-white"}}
+                  classNames={{title: "text-gray-200"}}
                 >
-                  <div>
+                  <div className="text-gray-200">
                     What you enter here is what will appear next to your Tidbits
                     when you post. Most people use their first or full name. It
                     exists for display purposes only and you can change it at
@@ -63,7 +63,11 @@ export default function UsernameModal({
               </Accordion>
             </ModalBody>
             <ModalFooter>
-              <Button className="bg-gold" onPress={() => onSave(username)}>
+              <Button
+                isDisabled={username === ""}
+                className="bg-gold"
+                onPress={() => onSave(username)}
+              >
                 Save
               </Button>
             </ModalFooter>

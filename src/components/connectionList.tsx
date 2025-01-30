@@ -63,7 +63,7 @@ export const ConnectionList = () => {
   }, [auth.currentUser]);
 
   return (
-    <div className="p-4 bg-burgundy text-white">
+    <div className="p-4 bg-burgundy text-gray-200">
       {connections.length === 0 ? (
         <p>No connections yet</p>
       ) : (

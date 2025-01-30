@@ -37,29 +37,28 @@ export const Navbar = () => {
   return (
     <HeroUINavbar
       isMenuOpen={isMenuOpen}
-      className="text-white items-baseline bg-burgundy"
+      className="text-gray-200 px-8 items-baseline bg-burgundy"
       classNames={{wrapper: "px-0"}}
     >
       <NavbarContent>
+        <NavbarBrand>
+          <span className="font-semibold text-gold text-xl">tidbit</span>
+        </NavbarBrand>
+        <span className="sm:hidden block w-full text-center">
+          {getPageTitle()}
+        </span>
+
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="sm:hidden"
           onPress={() => setIsMenuOpen(!isMenuOpen)}
         />
-        <NavbarBrand className="flex flex-row-reverse sm:flex-row justify-between w-full sm:w-auto">
-          <span className="sm:hidden flex justify-left sm:justify-center w-full order-2">
-            {getPageTitle()}
-          </span>
-          <span className="font-semibold text-gold text-xl order-1 sm:order-none">
-            tidbit
-          </span>
-        </NavbarBrand>
       </NavbarContent>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
           <Link
-            className={getLinkClass("/dashboard", "text-white")}
+            className={getLinkClass("/dashboard", "text-gray-200")}
             href="/dashboard"
           >
             Dashboard
@@ -67,7 +66,7 @@ export const Navbar = () => {
         </NavbarItem>
         <NavbarItem>
           <Link
-            className={getLinkClass("/settings/connections", "text-white")}
+            className={getLinkClass("/settings/connections", "text-gray-200")}
             href="/settings/connections"
           >
             Connections
@@ -75,7 +74,7 @@ export const Navbar = () => {
         </NavbarItem>
         <NavbarItem>
           <Link
-            className={getLinkClass("/settings/invite", "text-white")}
+            className={getLinkClass("/settings/invite", "text-gray-200")}
             href="/settings/invite"
           >
             Invite
@@ -83,7 +82,7 @@ export const Navbar = () => {
         </NavbarItem>
         <NavbarItem>
           <Link
-            className={getLinkClass("/settings", "text-white")}
+            className={getLinkClass("/settings", "text-gray-200")}
             href="/settings"
           >
             Settings

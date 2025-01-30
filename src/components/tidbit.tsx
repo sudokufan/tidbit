@@ -14,7 +14,7 @@ const Tidbit: React.FC<TidbitItemProps> = ({tidbit, formatTimeLeft}) => {
   );
   const timeSince = formatDistanceToNowStrict(timestampDate, {addSuffix: true});
   return (
-    <Card shadow="md" radius="lg" isHoverable className="w-full">
+    <Card shadow="md" radius="lg" isHoverable className="w-full bg-gray-100">
       <CardBody className="flex flex-row items-center">
         <div className="text-4xl mr-4">{tidbit.emoji}</div>
         <div className="flex-1">

@@ -87,6 +87,6 @@ export const Invite = () => {
   };
 
   return (
-    <div className="p-4 bg-burgundy text-white text-center">{message}</div>
+    <div className="p-4 bg-burgundy text-gray-200 text-center">{message}</div>
   );
 };

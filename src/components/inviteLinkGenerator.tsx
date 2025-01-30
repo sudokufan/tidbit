@@ -10,7 +10,7 @@ export const InviteLinkGenerator = () => {
   };
 
   return (
-    <div className="p-4 bg-burgundy text-white">
+    <div className="p-4 bg-burgundy text-gray-200">
       <button
         onClick={handleGenerateLink}
         className="bg-gold text-black px-4 py-2 rounded"

@@ -85,7 +85,7 @@ export const TidbitFeed = ({refresh}: TidbitFeedProps) => {
         </Select>
       </div> */}
       {tidbits.length === 0 ? (
-        <p className="text-white">No Tidbits from your connections yet.</p>
+        <p className="text-gray-200">No Tidbits from your connections yet.</p>
       ) : (
         sortTidbits(tidbits).map((tidbit) => (
           <Tidbit key={tidbit.id} tidbit={tidbit} />

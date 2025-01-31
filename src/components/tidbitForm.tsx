@@ -14,10 +14,15 @@ import {Textarea} from "@heroui/react";
 
 type TidbitFormProps = {
   onPostConfirm?: () => void;
+  onLatestTidbitUpdated?: (timestamp: number) => void; // New prop
   disabled: boolean;
 };
 
-export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
+export const TidbitForm = ({
+  onPostConfirm,
+  onLatestTidbitUpdated,
+  disabled,
+}: TidbitFormProps) => {
   const [message, setMessage] = useState("");
   const [emoji, setEmoji] = useState("🎉");
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -30,16 +35,9 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
   } | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  //   • Subscribes to a Firestore “tidbits” document for the current user.
-  // • Whenever this doc changes, we read its data (like emoji, message, and timestamp).
-  // • If there’s a valid timestamp from today, we calculate how much time is left until the user can post again, disable posting if necessary, and store that time.
-  // • If you have not posted today (or there’s no timestamp), we enable posting.
-  // • On cleanup, it stops listening to Firestore.
   useEffect(() => {
     if (!auth.currentUser) return;
-
     const tidbitRef = doc(db, "tidbits", auth.currentUser.uid);
-
     const unsubscribe = onSnapshot(tidbitRef, (snapshot) => {
       if (snapshot.exists()) {
         const tidbitData = snapshot.data();
@@ -49,7 +47,9 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
           username: tidbitData.username,
           timestamp: tidbitData.timestamp,
         });
-
+        if (tidbitData.timestamp) {
+          onLatestTidbitUpdated?.(tidbitData.timestamp.toMillis()); // Send timestamp up
+        }
         const lastTimestamp = tidbitData.timestamp?.toMillis();
         if (lastTimestamp) {
           const lastDate = new Date(lastTimestamp);
@@ -58,7 +58,6 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
             lastDate.getUTCDate() === now.getUTCDate() &&
             lastDate.getUTCMonth() === now.getUTCMonth() &&
             lastDate.getUTCFullYear() === now.getUTCFullYear();
-
           if (isToday) {
             setCanPost(false);
             return;
@@ -67,7 +66,6 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
       }
       setCanPost(true);
     });
-
     return () => unsubscribe();
   }, [auth.currentUser]);
 
@@ -109,18 +107,13 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
     return () => clearInterval(interval);
   }, [latestTidbit]);
 
-  // • Gathers the current user’s ID and looks up the user’s name in Firestore.
-  // • Creates or updates a “tidbits” doc with the user’s ID, name, chosen emoji, message, and a new timestamp.
-  // • Resets the local state to indicate we’ve just posted: clears out the message, sets the cooldown timer back to 24 hours, disables future posts, and resets any pending states.
   const confirmPostTidbit = async () => {
     if (!auth.currentUser) return;
-
     const userId = auth.currentUser.uid;
     const tidbitRef = doc(db, "tidbits", userId);
     const userRef = doc(db, "users", userId);
     const userSnap = await getDoc(userRef);
     const username = userSnap.data()?.name;
-
     await setDoc(tidbitRef, {
       userId,
       username,
@@ -128,10 +121,8 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
       message,
       timestamp: serverTimestamp(),
     });
-
     await updateTidbitFeed();
     onPostConfirm?.();
-
     setLatestTidbit({
       emoji,
       message,
@@ -141,6 +132,7 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
         nanoseconds: (Date.now() % 1000) * 1000000,
       },
     });
+    onLatestTidbitUpdated?.(Date.now());
     setMessage("");
     setCanPost(false);
   };
@@ -168,7 +160,6 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
             >
               {emoji}
             </button>
-
             {showEmojiPicker && (
               <div className="absolute top-20 -left-3 z-50">
                 <EmojiPicker
@@ -179,7 +170,6 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
                 />
               </div>
             )}
-
             <Textarea
               placeholder={
                 disabled ? "Set your display name!" : "Share your tidbit"

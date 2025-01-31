@@ -11,30 +11,38 @@ import Tidbit from "./tidbit";
 
 type TidbitFeedProps = {
   refresh: boolean;
+  latestTidbitTimestamp?: number | null; // New prop
 };
 
-export const TidbitFeed = ({refresh}: TidbitFeedProps) => {
+export const TidbitFeed = ({
+  refresh,
+  latestTidbitTimestamp = 0,
+}: TidbitFeedProps) => {
   const [tidbits, setTidbits] = useState<TidbitType[]>([]);
   const [user] = useAuthState(auth);
-  // const [sortCriteria, setSortCriteria] = useState<"time" | "username">("time");
   const sortCriteria = "time";
 
   useEffect(() => {
     if (!user) return;
-
     const fetchFeed = async () => {
       const userId = user.uid;
       const cachedFeed = await loadFeedFromLocalStorage(userId);
 
       if (cachedFeed && cachedFeed.lastUpdated) {
-        const tidbitTime = cachedFeed.lastUpdated;
-        const now = Date.now();
-        const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000;
-
-        console.log("cachedFeed last updated:", cachedFeed.lastUpdated);
-
-        if (tidbitTime >= twentyFourHoursAgo && tidbitTime <= now) {
-          console.log("🕰 Using localStorage daily feed.");
+        if (latestTidbitTimestamp === null) {
+          setTidbits(cachedFeed.tidbits || []);
+          return;
+        }
+        if (cachedFeed.lastUpdated < latestTidbitTimestamp) {
+          const dailyFeedRef = doc(db, "dailyFeed", userId);
+          const dailyFeedSnap = await getDoc(dailyFeedRef);
+          setTidbits(dailyFeedSnap.data()?.tidbits || []);
+          await saveFeedToLocalStorage(userId, {
+            tidbits: dailyFeedSnap.data()?.tidbits,
+            lastUpdated: Timestamp.now().toMillis(),
+          });
+          return;
+        } else {
           setTidbits(cachedFeed.tidbits || []);
           return;
         }
@@ -42,18 +50,14 @@ export const TidbitFeed = ({refresh}: TidbitFeedProps) => {
 
       const dailyFeedRef = doc(db, "dailyFeed", userId);
       const dailyFeedSnap = await getDoc(dailyFeedRef);
-      console.log("🕰 Using Firestore daily feed.");
       setTidbits(dailyFeedSnap.data()?.tidbits || []);
       await saveFeedToLocalStorage(userId, {
         tidbits: dailyFeedSnap.data()?.tidbits,
         lastUpdated: Timestamp.now().toMillis(),
       });
-
-      return;
     };
-
     fetchFeed();
-  }, [user, refresh]);
+  }, [user, refresh, latestTidbitTimestamp]);
 
   const sortTidbits = (tidbits: TidbitType[]) => {
     return tidbits.sort((a, b) => {
@@ -69,24 +73,6 @@ export const TidbitFeed = ({refresh}: TidbitFeedProps) => {
 
   return (
     <div className="mt-4 flex flex-col gap-3 lg:gap-5 w-full">
-      {/* // add sorting by username or time to settings, defaults to time oldest to newest atm */}
-      {/* <div className="flex justify-end mb-4">
-        <Select
-          label="Sort by"
-          selectedKeys={[sortCriteria]}
-          onSelectionChange={(keys) =>
-            setSortCriteria(keys.currentKey as "time" | "username")
-          }
-          className="w-[120px]"
-        >
-          <SelectItem key="time" value="time">
-            Time
-          </SelectItem>
-          <SelectItem key="username" value="username">
-            Username
-          </SelectItem>
-        </Select>
-      </div> */}
       {tidbits.length === 0 ? (
         <p className="text-gray-200">No Tidbits from your connections yet.</p>
       ) : (

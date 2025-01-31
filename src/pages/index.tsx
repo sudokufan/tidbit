@@ -12,9 +12,13 @@ export default function IndexPage() {
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState<string | null>(null);
 
+  // New state
+  const [latestTidbitTimestamp, setLatestTidbitTimestamp] = useState<
+    number | null
+  >(null);
+
   useEffect(() => {
     if (!user) return;
-
     const fetchUserProfile = async () => {
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
@@ -26,16 +30,13 @@ export default function IndexPage() {
         setIsModalOpen(true);
       }
     };
-
     fetchUserProfile();
   }, [user]);
 
   const handleSaveUsername = async (username: string) => {
     if (!user) return;
-
     const userRef = doc(db, "users", user.uid);
     await setDoc(userRef, {name: username}, {merge: true});
-
     setUsername(username);
     setIsModalOpen(false);
   };
@@ -46,9 +47,13 @@ export default function IndexPage() {
         <div className="flex flex-col mt-8 items-center max-w-5xl w-full">
           <TidbitForm
             onPostConfirm={() => setRefreshFeed(!refreshFeed)}
+            onLatestTidbitUpdated={(ts) => setLatestTidbitTimestamp(ts)}
             disabled={!username}
           />
-          <TidbitFeed refresh={refreshFeed} />
+          <TidbitFeed
+            refresh={refreshFeed}
+            latestTidbitTimestamp={latestTidbitTimestamp}
+          />
         </div>
       </div>
       <UsernameModal

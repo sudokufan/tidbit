@@ -130,30 +130,36 @@ export const Settings = () => {
   if (!user) return <p>Please log in to manage your profile.</p>;
 
   return (
-    <div className="p-4 max-w-4xl mx-auto bg-burgundy text-gray-200">
-      <div className="mb-8">
-        <label className="block text-sm font-semibold mb-1">Display name</label>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="border p-2 rounded w-full text-black"
-        />
+    <div className="p-8 w-full justify-center flex">
+      <div className="max-w-5xl mx-auto bg-burgundy text-gray-200">
+        <div className="mb-8">
+          <label className="block text-sm font-semibold mb-1">
+            Display name
+          </label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="border p-2 rounded w-full text-black"
+          />
+          <button
+            onClick={updateUsername}
+            disabled={loading}
+            className="mt-2 bg-gold text-black px-4 py-2 rounded w-full"
+          >
+            Update Display Name
+          </button>
+        </div>
+        <label className="block text-sm font-semibold mb-1">
+          Delete account
+        </label>
         <button
-          onClick={updateUsername}
-          disabled={loading}
-          className="mt-2 bg-gold text-black px-4 py-2 rounded w-full"
+          onClick={deleteAccount}
+          className="bg-[#FF5252] text-black px-4 py-2 rounded w-full"
         >
-          Update Display Name
+          Delete Account
         </button>
       </div>
-      <label className="block text-sm font-semibold mb-1">Delete account</label>
-      <button
-        onClick={deleteAccount}
-        className="bg-[#FF5252] text-black px-4 py-2 rounded w-full"
-      >
-        Delete Account
-      </button>
     </div>
   );
 };

@@ -43,7 +43,7 @@ export default function IndexPage() {
   return (
     <>
       <div className="flex justify-center w-full bg-burgundy px-8">
-        <div className="flex flex-col items-center max-w-[1024px] w-full">
+        <div className="flex flex-col mt-8 items-center max-w-[1024px] w-full">
           <TidbitForm
             onPostConfirm={() => setRefreshFeed(!refreshFeed)}
             disabled={!username}

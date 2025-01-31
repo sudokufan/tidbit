@@ -63,13 +63,13 @@ export const ConnectionList = () => {
   }, [auth.currentUser]);
 
   return (
-    <div className="p-4 bg-burgundy text-gray-200">
+    <div className="p-8 bg-burgundy text-gray-200">
       {connections.length === 0 ? (
         <p>No connections yet</p>
       ) : (
         connections.map((connection) => (
           <div key={connection.id} className="w-full flex justify-center">
-            <div className="flex justify-between items-center p-2 border-b w-full xl:max-w-xl md:max-w-lg max-w-sm">
+            <div className="flex justify-between items-center py-2 border-b w-full max-w-5xl">
               <span>{connection.name}</span>
               <button
                 onClick={() => removeConnection(connection.id)}

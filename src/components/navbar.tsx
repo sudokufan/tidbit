@@ -91,7 +91,7 @@ export const Navbar = () => {
       <NavbarMenu>
         <NavbarMenuItem>
           <Link
-            onPress={() => setIsMenuOpen(false)}
+            onPress={() => setIsMenuOpen(!isMenuOpen)}
             className="text-burgundy"
             href="/dashboard"
           >
@@ -100,7 +100,7 @@ export const Navbar = () => {
         </NavbarMenuItem>
         <NavbarMenuItem>
           <Link
-            onPress={() => setIsMenuOpen(false)}
+            onPress={() => setIsMenuOpen(!isMenuOpen)}
             className="text-burgundy"
             href="/settings/connections"
           >
@@ -109,7 +109,7 @@ export const Navbar = () => {
         </NavbarMenuItem>
         <NavbarMenuItem>
           <Link
-            onPress={() => setIsMenuOpen(false)}
+            onPress={() => setIsMenuOpen(!isMenuOpen)}
             className="text-burgundy"
             href="/settings/invite"
           >
@@ -118,7 +118,7 @@ export const Navbar = () => {
         </NavbarMenuItem>
         <NavbarMenuItem>
           <Link
-            onPress={() => setIsMenuOpen(false)}
+            onPress={() => setIsMenuOpen(!isMenuOpen)}
             className="text-burgundy"
             href="/settings"
           >

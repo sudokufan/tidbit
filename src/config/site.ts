@@ -2,7 +2,7 @@ export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
   name: "Tidbit",
-  description: "A daily glimpse into the people who matter.",
+  description: "Connected, not distracted",
   navItems: [
     {
       label: "Home",

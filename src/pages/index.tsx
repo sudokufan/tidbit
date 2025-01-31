@@ -41,17 +41,21 @@ export default function IndexPage() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center bg-burgundy p-8 lg:px-56">
+    <>
+      <div className="flex justify-center w-full bg-burgundy px-8">
+        <div className="flex flex-col items-center max-w-[1024px] w-full">
+          <TidbitForm
+            onPostConfirm={() => setRefreshFeed(!refreshFeed)}
+            disabled={!username}
+          />
+          <TidbitFeed refresh={refreshFeed} />
+        </div>
+      </div>
       <UsernameModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveUsername}
       />
-      <TidbitForm
-        onPostConfirm={() => setRefreshFeed(!refreshFeed)}
-        disabled={!username}
-      />
-      <TidbitFeed refresh={refreshFeed} />
-    </div>
+    </>
   );
 }

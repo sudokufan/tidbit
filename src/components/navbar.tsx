@@ -42,7 +42,12 @@ export const Navbar = () => {
     >
       <NavbarContent>
         <NavbarBrand>
-          <span className="font-semibold text-gold text-xl">tidbit</span>
+          <Link
+            className={getLinkClass("/dashboard", "text-gray-200")}
+            href="/dashboard"
+          >
+            <span className="font-semibold text-gold text-xl">tidbit</span>
+          </Link>
         </NavbarBrand>
         <h1 className="sm:hidden block w-full text-center">{getPageTitle()}</h1>
 

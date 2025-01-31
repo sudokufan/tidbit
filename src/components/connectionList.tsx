@@ -65,7 +65,9 @@ export const ConnectionList = () => {
   return (
     <div className="p-8 bg-burgundy text-gray-200">
       {connections.length === 0 ? (
-        <p>No connections yet</p>
+        <div className="w-full flex justify-center">
+          <p className="flex w-full max-w-5xl">No connections yet</p>
+        </div>
       ) : (
         connections.map((connection) => (
           <div key={connection.id} className="w-full flex justify-center">

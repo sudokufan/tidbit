@@ -65,7 +65,7 @@ export const TidbitFeed = ({refresh}: TidbitFeedProps) => {
   if (!user) return <p>Please log in to see Tidbits.</p>;
 
   return (
-    <div className="p-4 flex flex-col gap-2">
+    <div className="mt-4 flex flex-col gap-3 lg:gap-5">
       {/* // add sorting by username or time to settings, defaults to time oldest to newest atm */}
       {/* <div className="flex justify-end mb-4">
         <Select

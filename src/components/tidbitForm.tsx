@@ -21,7 +21,6 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
   const [message, setMessage] = useState("");
   const [emoji, setEmoji] = useState("🎉");
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
-  const [lastTimestamp, setLastTimestamp] = useState<number | null>(null);
   const [canPost, setCanPost] = useState(false);
   const [latestTidbit, setLatestTidbit] = useState<{
     emoji: string;
@@ -33,8 +32,8 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
 
   //   • Subscribes to a Firestore “tidbits” document for the current user.
   // • Whenever this doc changes, we read its data (like emoji, message, and timestamp).
-  // • If there’s a valid timestamp within the past 24 hours, we calculate how much time is left until the user can post again, disable posting if necessary, and store that time.
-  // • If the 24 hours are already up (or there’s no timestamp), we enable posting.
+  // • If there’s a valid timestamp from today, we calculate how much time is left until the user can post again, disable posting if necessary, and store that time.
+  // • If you have not posted today (or there’s no timestamp), we enable posting.
   // • On cleanup, it stops listening to Firestore.
   useEffect(() => {
     if (!auth.currentUser) return;
@@ -53,11 +52,14 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
 
         const lastTimestamp = tidbitData.timestamp?.toMillis();
         if (lastTimestamp) {
-          setLastTimestamp(lastTimestamp);
+          const lastDate = new Date(lastTimestamp);
           const now = new Date();
-          const diffMs = 24 * 60 * 60 * 1000 - (now.getTime() - lastTimestamp);
-          if (diffMs > 0) {
-            setTimeLeft(diffMs);
+          const isToday =
+            lastDate.getUTCDate() === now.getUTCDate() &&
+            lastDate.getUTCMonth() === now.getUTCMonth() &&
+            lastDate.getUTCFullYear() === now.getUTCFullYear();
+
+          if (isToday) {
             setCanPost(false);
             return;
           }
@@ -69,32 +71,45 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
     return () => unsubscribe();
   }, [auth.currentUser]);
 
-  // • Looks at a “lastTimestamp” (when the user last posted).
-  // • Calculates the remaining 24-hour window.
-  // • If that time is up, posting is allowed. Otherwise, we keep track of how many milliseconds remain.
-  // • It updates every second via setInterval to give a live countdown.
   useEffect(() => {
-    if (!lastTimestamp) return;
-
-    const updateCountdown = () => {
-      const now = Date.now();
-      const remainingTime = lastTimestamp + 24 * 60 * 60 * 1000 - now;
-
-      if (remainingTime <= 0) {
-        setTimeLeft(0);
+    if (!latestTidbit) return;
+    const tick = () => {
+      const lastMS =
+        latestTidbit.timestamp?.seconds * 1000 +
+        latestTidbit.timestamp?.nanoseconds / 1000000;
+      if (!lastMS) {
+        setTimeLeft(null);
         setCanPost(true);
-      } else {
-        setTimeLeft(remainingTime);
+        return;
       }
+      const postedDate = new Date(lastMS);
+      const now = new Date();
+      const isToday =
+        postedDate.getUTCDate() === now.getUTCDate() &&
+        postedDate.getUTCMonth() === now.getUTCMonth() &&
+        postedDate.getUTCFullYear() === now.getUTCFullYear();
+      if (!isToday) {
+        setTimeLeft(null);
+        setCanPost(true);
+        return;
+      }
+      const nextMidnight = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1),
+      );
+      const msLeft = nextMidnight.getTime() - now.getTime();
+      if (msLeft <= 0) {
+        setTimeLeft(null);
+        setCanPost(true);
+        return;
+      }
+      setTimeLeft(msLeft);
     };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [lastTimestamp]);
+  }, [latestTidbit]);
 
-  //   • Gathers the current user’s ID and looks up the user’s name in Firestore (defaulting to “Unknown”).
+  // • Gathers the current user’s ID and looks up the user’s name in Firestore.
   // • Creates or updates a “tidbits” doc with the user’s ID, name, chosen emoji, message, and a new timestamp.
   // • Resets the local state to indicate we’ve just posted: clears out the message, sets the cooldown timer back to 24 hours, disables future posts, and resets any pending states.
   const confirmPostTidbit = async () => {
@@ -127,7 +142,6 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
       },
     });
     setMessage("");
-    setTimeLeft(24 * 60 * 60 * 1000);
     setCanPost(false);
   };
 
@@ -141,8 +155,8 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
 
   return (
     <>
-      {latestTidbit && timeLeft !== null && timeLeft > 0 ? (
-        <div className="max-w-[1055px] mb-8 px-4 w-full">
+      {latestTidbit && canPost === false ? (
+        <div className="mb-8 w-full">
           <Tidbit tidbit={latestTidbit} formatTimeLeft={formatTimeLeft} />
         </div>
       ) : (

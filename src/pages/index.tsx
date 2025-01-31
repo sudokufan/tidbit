@@ -41,7 +41,7 @@ export default function IndexPage() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center bg-burgundy p-4">
+    <div className="w-full flex flex-col items-center bg-burgundy p-8 lg:px-56">
       <UsernameModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

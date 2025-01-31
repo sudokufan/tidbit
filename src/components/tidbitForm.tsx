@@ -116,15 +116,37 @@ export const TidbitForm = ({
     if (!auth.currentUser) return;
     const userId = auth.currentUser.uid;
     await setDoc(doc(db, "tidbits", userId), {});
+
+    // ✅ Mark that the user used Undo today
+    await setDoc(
+      doc(db, "users", userId),
+      {
+        lastUndo: serverTimestamp(),
+      },
+      {merge: true},
+    );
   };
 
   const confirmPostTidbit = async () => {
     if (!auth.currentUser) return;
+
     const userId = auth.currentUser.uid;
     const tidbitRef = doc(db, "tidbits", userId);
     const userRef = doc(db, "users", userId);
     const userSnap = await getDoc(userRef);
     const username = userSnap.data()?.name;
+
+    // Check if Undo has been used today
+    const userData = userSnap.data();
+    const lastUndoTimestamp = userData?.lastUndo?.toMillis() ?? 0;
+    const lastUndoDate = new Date(lastUndoTimestamp);
+    const today = new Date();
+    const hasUndoneToday =
+      lastUndoDate.getUTCDate() === today.getUTCDate() &&
+      lastUndoDate.getUTCMonth() === today.getUTCMonth() &&
+      lastUndoDate.getUTCFullYear() === today.getUTCFullYear();
+
+    // Save tidbit
     await setDoc(tidbitRef, {
       userId,
       username,
@@ -132,7 +154,12 @@ export const TidbitForm = ({
       message,
       timestamp: serverTimestamp(),
     });
-    await updateTidbitFeed();
+
+    // ✅ Only update feed if user hasn't undone today
+    if (!hasUndoneToday) {
+      await updateTidbitFeed();
+    }
+
     onPostConfirm?.();
     setLatestTidbit({
       emoji,

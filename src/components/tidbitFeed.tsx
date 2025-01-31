@@ -28,9 +28,10 @@ export const TidbitFeed = ({refresh}: TidbitFeedProps) => {
 
       if (cachedFeed && cachedFeed.lastUpdated) {
         const tidbitTime = cachedFeed.lastUpdated;
-        const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
+        const now = Date.now();
+        const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000;
 
-        if (tidbitTime >= twentyFourHoursAgo) {
+        if (tidbitTime >= twentyFourHoursAgo && tidbitTime <= now) {
           console.log("🕰 Using localStorage daily feed.");
           setTidbits(cachedFeed.tidbits || []);
           return;

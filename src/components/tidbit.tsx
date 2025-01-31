@@ -1,7 +1,7 @@
 import React from "react";
 import {Card, CardBody} from "@heroui/react";
 import {TidbitType} from "@/types/tidbit";
-import {format} from "date-fns";
+import {getFormattedDate} from "@/helpers/getFormattedDate";
 
 type TidbitItemProps = {
   tidbit: TidbitType;
@@ -12,7 +12,7 @@ const Tidbit: React.FC<TidbitItemProps> = ({tidbit, formatTimeLeft}) => {
   const timestampDate = new Date(
     tidbit.timestamp.seconds * 1000 + tidbit.timestamp.nanoseconds / 1000000,
   );
-  const timeDisplayed = format(timestampDate, "h.mm aa");
+  const timeDisplayed = getFormattedDate(timestampDate);
   return (
     <Card shadow="md" radius="lg" isHoverable className="w-full bg-gray-100">
       <CardBody className="flex flex-row items-center">

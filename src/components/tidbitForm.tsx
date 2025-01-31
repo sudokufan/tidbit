@@ -14,7 +14,7 @@ import {Textarea} from "@heroui/react";
 
 type TidbitFormProps = {
   onPostConfirm?: () => void;
-  onLatestTidbitUpdated?: (timestamp: number) => void; // New prop
+  onLatestTidbitUpdated?: (timestamp: number) => void;
   disabled: boolean;
 };
 
@@ -27,6 +27,11 @@ export const TidbitForm = ({
   const [emoji, setEmoji] = useState("🎉");
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [canPost, setCanPost] = useState(false);
+  const [undoVisible, setUndoVisible] = useState(false);
+  const [_, setUndoTimer] = useState(0);
+  const [undoIntervalId, setUndoIntervalId] = useState<ReturnType<
+    typeof setInterval
+  > | null>(null);
   const [latestTidbit, setLatestTidbit] = useState<{
     emoji: string;
     message: string;
@@ -107,6 +112,12 @@ export const TidbitForm = ({
     return () => clearInterval(interval);
   }, [latestTidbit]);
 
+  const removePost = async () => {
+    if (!auth.currentUser) return;
+    const userId = auth.currentUser.uid;
+    await setDoc(doc(db, "tidbits", userId), {});
+  };
+
   const confirmPostTidbit = async () => {
     if (!auth.currentUser) return;
     const userId = auth.currentUser.uid;
@@ -133,8 +144,27 @@ export const TidbitForm = ({
       },
     });
     onLatestTidbitUpdated?.(Date.now());
-    setMessage("");
     setCanPost(false);
+  };
+
+  const handlePostClick = async () => {
+    if (!auth.currentUser) return;
+    confirmPostTidbit();
+    setUndoVisible(true);
+    setUndoTimer(10);
+    const interval = setInterval(() => {
+      setUndoTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setUndoVisible(false);
+          setUndoTimer(0);
+          setMessage("");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    setUndoIntervalId(interval);
   };
 
   const formatTimeLeft = () => {
@@ -147,7 +177,7 @@ export const TidbitForm = ({
 
   return (
     <>
-      {latestTidbit && canPost === false ? (
+      {latestTidbit && canPost === false && undoVisible === false ? (
         <div className="mb-8 w-full">
           <Tidbit tidbit={latestTidbit} formatTimeLeft={formatTimeLeft} />
         </div>
@@ -172,21 +202,41 @@ export const TidbitForm = ({
             )}
             <Textarea
               placeholder={
-                disabled ? "Set your display name!" : "Share your tidbit"
+                disabled
+                  ? "Set your display name!"
+                  : undoVisible
+                    ? message
+                    : "Share your tidbit"
               }
-              isDisabled={disabled}
+              isDisabled={disabled || undoVisible}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               className="flex-1"
               minRows={1}
             />
             <button
-              onClick={confirmPostTidbit}
-              disabled={!canPost}
+              onClick={handlePostClick}
+              disabled={!canPost || message === ""}
               className="bg-gold px-4 py-2 rounded disabled:opacity-50"
             >
-              Post
+              {undoVisible ? "Posted!" : "Post"}
             </button>
+            {undoVisible && (
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => {
+                    if (undoIntervalId) clearInterval(undoIntervalId);
+                    setUndoVisible(false);
+                    setUndoTimer(0);
+                    removePost();
+                    setMessage("");
+                  }}
+                  className="bg-burgundy text-gray-200 px-4 py-2 rounded"
+                >
+                  Undo
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}

@@ -161,7 +161,7 @@ export const TidbitForm = ({onPostConfirm, disabled}: TidbitFormProps) => {
         </div>
       ) : (
         <>
-          <div className="flex items-center max-w-[1030px] mb-8 w-full space-x-3 bg-white p-4 rounded-lg shadow-md relative">
+          <div className="flex items-center max-w-5xl mb-8 w-full space-x-3 bg-white p-4 rounded-lg shadow-md relative">
             <button
               onClick={() => setShowEmojiPicker((prev) => !prev)}
               className="w-12 h-12 text-3xl border rounded bg-gray-100 flex items-center justify-center"

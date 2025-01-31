@@ -62,9 +62,9 @@ export const TidbitFeed = ({
   const sortTidbits = (tidbits: TidbitType[]) => {
     return tidbits.sort((a, b) => {
       if (sortCriteria === "time") {
-        return a.timestamp.seconds - b.timestamp.seconds;
+        return b.timestamp.seconds - a.timestamp.seconds;
       } else {
-        return b.username.localeCompare(a.username);
+        return a.username.localeCompare(b.username);
       }
     });
   };

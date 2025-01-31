@@ -53,7 +53,7 @@ export const Navbar = () => {
 
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="sm:hidden"
+          className="sm:hidden p-4"
           onPress={() => setIsMenuOpen(!isMenuOpen)}
         />
       </NavbarContent>
@@ -93,11 +93,11 @@ export const Navbar = () => {
         </NavbarItem>
       </NavbarContent>
 
-      <NavbarMenu>
+      <NavbarMenu className="gap-0">
         <NavbarMenuItem>
           <Link
             onPress={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-burgundy"
+            className="text-burgundy py-2 w-full"
             href="/dashboard"
           >
             Dashboard
@@ -106,7 +106,7 @@ export const Navbar = () => {
         <NavbarMenuItem>
           <Link
             onPress={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-burgundy"
+            className="text-burgundy py-2 w-full"
             href="/settings/connections"
           >
             Connections
@@ -115,7 +115,7 @@ export const Navbar = () => {
         <NavbarMenuItem>
           <Link
             onPress={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-burgundy"
+            className="text-burgundy py-2 w-full"
             href="/settings/invite"
           >
             Invite
@@ -124,7 +124,7 @@ export const Navbar = () => {
         <NavbarMenuItem>
           <Link
             onPress={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-burgundy"
+            className="text-burgundy py-2 w-full"
             href="/settings"
           >
             Settings
